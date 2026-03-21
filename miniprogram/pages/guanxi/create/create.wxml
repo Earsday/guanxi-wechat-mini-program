@@ -1,0 +1,118 @@
+<!--pages/guanxi/create/create.wxml-->
+<view class="container">
+  <view class="form">
+    <!-- From character -->
+    <view class="form-item">
+      <text class="form-label">从</text>
+      <picker
+        class="picker"
+        mode="selector"
+        range="{{characters}}"
+        range-key="name"
+        bindchange="onFromCharacterChange"
+      >
+        <view class="picker-view">
+          <text wx:if="{{selectedFromId}}">已选择</text>
+          <text wx:else class="placeholder">选择人物</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- To character -->
+    <view class="form-item">
+      <text class="form-label">到</text>
+      <picker
+        class="picker"
+        mode="selector"
+        range="{{characters}}"
+        range-key="name"
+        bindchange="onToCharacterChange"
+      >
+        <view class="picker-view">
+          <text wx:if="{{selectedToId}}">已选择</text>
+          <text wx:else class="placeholder">选择人物</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- Relationship type -->
+    <view class="form-item">
+      <text class="form-label">关系类型</text>
+      <picker
+        class="picker"
+        mode="selector"
+        range="{{types}}"
+        range-key="name"
+        bindchange="onTypeChange"
+      >
+        <view class="picker-view">
+          <text wx:if="{{selectedTypeId}}">{{selectedType.name}}</text>
+          <text wx:else class="placeholder">选择关系类型</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- Dynamic form fields -->
+    <block wx:if="{{selectedType}}">
+      <view
+        class="form-item"
+        wx:for="{{selectedType.formFields}}"
+        wx:key="key"
+      >
+        <text class="form-label">
+          {{item.label}}
+          <text class="required" wx:if="{{item.required}}">*</text>
+        </text>
+
+        <!-- Text input -->
+        <input
+          wx:if="{{item.type === 'text'}}"
+          class="input"
+          type="text"
+          placeholder="{{item.placeholder}}"
+          value="{{formData[item.key]}}"
+          data-key="{{item.key}}"
+          bindinput="onFormInput"
+        />
+
+        <!-- Select picker -->
+        <picker
+          wx:if="{{item.type === 'select'}}"
+          class="picker"
+          mode="selector"
+          range="{{item.options}}"
+          range-key="label"
+          data-key="{{item.key}}"
+          bindchange="onFormInput"
+        >
+          <view class="picker-view">
+            <text wx:if="{{formData[item.key]}}">
+              {{formData[item.key]}}
+            </text>
+            <text wx:else class="placeholder">{{item.placeholder || '请选择'}}</text>
+          </view>
+        </picker>
+
+        <!-- Date picker -->
+        <picker
+          wx:if="{{item.type === 'date'}}"
+          class="picker"
+          mode="date"
+          value="{{formData[item.key]}}"
+          data-key="{{item.key}}"
+          bindchange="onFormInput"
+        >
+          <view class="picker-view">
+            <text wx:if="{{formData[item.key]}}">{{formData[item.key]}}</text>
+            <text wx:else class="placeholder">{{item.placeholder || '选择日期'}}</text>
+          </view>
+        </picker>
+      </view>
+    </block>
+  </view>
+
+  <!-- Submit button -->
+  <view class="submit-container">
+    <button class="btn-submit" bindtap="onSubmit">创建关系</button>
+  </view>
+</view>

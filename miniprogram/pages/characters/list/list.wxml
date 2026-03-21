@@ -1,0 +1,45 @@
+<!--pages/characters/list/list.wxml-->
+<view class="container">
+  <!-- Search bar -->
+  <view class="search-bar">
+    <input
+      class="search-input"
+      type="text"
+      placeholder="搜索人物姓名或备注"
+      value="{{searchKeyword}}"
+      bindinput="onSearchInput"
+    />
+  </view>
+
+  <!-- Character list -->
+  <view class="character-list" wx:if="{{characters.length > 0}}">
+    <view
+      class="card character-item"
+      wx:for="{{characters}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goToDetail"
+    >
+      <view class="character-info">
+        <text class="character-name">{{item.name}}</text>
+        <text class="character-meta" wx:if="{{item.age}}">{{item.age}}岁</text>
+        <text class="character-meta" wx:if="{{item.gender}}">
+          {{item.gender === 'male' ? '男' : '女'}}
+        </text>
+      </view>
+      <view class="character-arrow">›</view>
+    </view>
+  </view>
+
+  <!-- Empty state -->
+  <view class="empty-state" wx:if="{{characters.length === 0}}">
+    <text class="empty-icon">👤</text>
+    <text class="empty-text">暂无人物</text>
+    <text class="empty-hint">点击下方按钮添加人物</text>
+  </view>
+
+  <!-- Add button -->
+  <view class="fab" bindtap="goToCreate">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

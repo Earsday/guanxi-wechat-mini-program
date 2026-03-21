@@ -1,0 +1,50 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- Header -->
+  <view class="header">
+    <text class="title">关系网</text>
+    <text class="subtitle">让复杂的人际关系变得清晰</text>
+  </view>
+
+  <!-- Statistics -->
+  <view class="stats-container">
+    <view class="stat-item">
+      <text class="stat-number">{{stats.characterCount}}</text>
+      <text class="stat-label">人物</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{stats.guanxiCount}}</text>
+      <text class="stat-label">关系</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-number">{{stats.typeCount}}</text>
+      <text class="stat-label">关系类型</text>
+    </view>
+  </view>
+
+  <!-- Quick Actions -->
+  <view class="actions-container">
+    <view class="card action-card" bindtap="goToCharacterList">
+      <text class="action-icon">👤</text>
+      <text class="action-title">管理人物</text>
+      <text class="action-desc">添加或查看人物信息</text>
+    </view>
+
+    <view class="card action-card" bindtap="goToCreateGuanxi">
+      <text class="action-icon">🔗</text>
+      <text class="action-title">创建关系</text>
+      <text class="action-desc">建立人物之间的关系</text>
+    </view>
+  </view>
+
+  <!-- Relationship Types Preview -->
+  <view class="types-section" wx:if="{{types.length > 0}}">
+    <text class="section-title">关系类型</text>
+    <view class="types-list">
+      <view class="type-item" wx:for="{{types}}" wx:key="id">
+        <text class="type-icon">{{item.icon}}</text>
+        <text class="type-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+</view>

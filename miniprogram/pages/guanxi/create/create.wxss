@@ -1,0 +1,79 @@
+/* pages/guanxi/create/create.wxss */
+
+.container {
+  padding: 20rpx;
+  padding-bottom: 160rpx;
+}
+
+.form {
+  background-color: white;
+  border-radius: 8rpx;
+  padding: 20rpx;
+}
+
+.form-item {
+  margin-bottom: 32rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  margin-bottom: 16rpx;
+  font-weight: 500;
+}
+
+.required {
+  color: var(--error-color);
+  margin-left: 4rpx;
+}
+
+.input {
+  width: 100%;
+  padding: 20rpx 24rpx;
+  border: 1rpx solid var(--border-color);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  background-color: #FAFAFA;
+}
+
+.picker {
+  width: 100%;
+}
+
+.picker-view {
+  padding: 20rpx 24rpx;
+  border: 1rpx solid var(--border-color);
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  background-color: #FAFAFA;
+}
+
+.placeholder {
+  color: var(--text-disabled);
+}
+
+/* Submit button */
+.submit-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx;
+  background-color: white;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 28rpx;
+  border-radius: 8rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-submit:active {
+  opacity: 0.8;
+}

@@ -1,0 +1,21 @@
+{
+  "name": "guanxi-wechat-mini-program",
+  "version": "0.1.0",
+  "description": "关系网 - A WeChat mini-program for managing personal relationships",
+  "main": "miniprogram/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/guanxi-wechat-mini-program.git"
+  },
+  "keywords": [
+    "wechat",
+    "mini-program",
+    "relationship-management",
+    "guanxi"
+  ],
+  "author": "",
+  "license": "MIT"
+}

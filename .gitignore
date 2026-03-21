@@ -1,0 +1,25 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# WeChat DevTools
+.DS_Store
+.idea/
+.vscode/
+
+# Private configuration
+project.private.config.json
+sitemap.json
+
+# Build output
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

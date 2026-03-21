@@ -1,0 +1,124 @@
+/* pages/characters/detail/detail.wxss */
+
+.container {
+  padding: 20rpx;
+  padding-bottom: 160rpx;
+}
+
+/* Character header */
+.character-header {
+  text-align: center;
+  padding: 40rpx;
+}
+
+.character-name {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+}
+
+.character-tags {
+  display: flex;
+  justify-content: center;
+  gap: 16rpx;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  padding: 8rpx 20rpx;
+  background-color: #F5F5F5;
+  border-radius: 20rpx;
+}
+
+/* Info sections */
+.info-section,
+.relationships-section,
+.notes-section {
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: bold;
+  color: var(--text-primary);
+  margin-bottom: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  margin-bottom: 16rpx;
+}
+
+.info-label {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-right: 12rpx;
+}
+
+.info-value {
+  font-size: 28rpx;
+  color: var(--text-primary);
+}
+
+/* Relationships */
+.relationships-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.relationship-item {
+  padding: 16rpx 20rpx;
+  background-color: #F5F5F5;
+  border-radius: 8rpx;
+}
+
+.relationship-type {
+  font-size: 28rpx;
+  color: var(--text-primary);
+}
+
+.empty-hint {
+  text-align: center;
+  padding: 40rpx 0;
+  color: var(--text-disabled);
+  font-size: 28rpx;
+}
+
+/* Notes */
+.notes-text {
+  font-size: 28rpx;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Actions */
+.actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  padding: 20rpx;
+  background-color: white;
+  box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.05);
+  gap: 20rpx;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 24rpx;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-danger {
+  background-color: var(--error-color);
+}
