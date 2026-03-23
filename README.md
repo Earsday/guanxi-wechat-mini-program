@@ -1,6 +1,6 @@
-# 关系网 WeChat Mini Program
+﻿# 人际关系图谱 WeChat Mini Program
 
-A WeChat mini-program for comprehensive relationship management.
+A WeChat mini-program for comprehensive guanxi management and exploration.
 
 ## Project Structure
 
