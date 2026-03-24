@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "关系网",
+  "navigationBarTitleText": "人际关系图谱",
   "usingComponents": {
     "stat-card": "../../components/stat-card/stat-card",
     "skeleton": "../../components/skeleton/skeleton"

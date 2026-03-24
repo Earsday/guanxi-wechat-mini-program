@@ -10,7 +10,6 @@ npm-debug.log*
 .DS_Store
 .idea/
 .vscode/
-.claude/
 
 # Private configuration
 project.private.config.json
@@ -24,3 +23,5 @@ build/
 *.tmp
 *.temp
 .cache/
+.claude/
+plans/

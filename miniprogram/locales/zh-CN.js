@@ -335,7 +335,7 @@ module.exports = {
 
   pages: {
     index: {
-      title: '关系网',
+      title: '人际关系图谱',
       subtitle: '让复杂的人际关系变得清晰',
       stats: {
         characters: '人物',
@@ -349,7 +349,7 @@ module.exports = {
         createRelationship: '创建关系',
         createRelationshipDesc: '建立新的人物关系',
         viewGraph: '查看图谱',
-        viewGraphDesc: '可视化展示关系网络'
+        viewGraphDesc: '可视化展示人际关系图谱'
       }
     },
     characterList: {
@@ -623,7 +623,7 @@ module.exports = {
     clearData: '清空数据',
     aboutSection: '关于',
     about: '关于应用',
-    appName: '关系网小程序',
+    appName: '人际关系图谱小程序',
     versionLabel: '版本',
     description: '让复杂的人际关系变得清晰',
     changeLanguageTitle: '切换语言',

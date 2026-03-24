@@ -1,0 +1,31 @@
+GuanXi WeChat Mini Program
+Copyright 2026 GuanXi WeChat Mini Program Contributors
+
+This product includes software developed at
+GuanXi WeChat Mini Program Project (https://github.com/[your-username]/guanxi-wechat-mini-program)
+
+This project uses the following open source components:
+
+- WeChat Mini Program Framework
+  Copyright (c) Tencent
+  Licensed under the Tencent WeChat Mini Program License
+  
+- IndexedDB-like storage implementation
+  Based on WeChat Mini Program storage APIs
+  
+All original work is licensed under the Apache License, Version 2.0.
+See LICENSE file for details.
+
+================================================================================
+
+The following contributors have made significant contributions to this project:
+
+- Initial Implementation and Architecture (2026)
+- UI/UX Components and Design System (2026)
+- Internationalization Support (2026)
+- Relationship Visualization and Graph Algorithms (2026)
+
+================================================================================
+
+For patent grant information, see section 3 of the Apache License 2.0
+in the LICENSE file.

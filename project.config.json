@@ -1,5 +1,5 @@
 {
-  "description": "关系网 - WeChat Mini Program for Relationship Management",
+  "description": "人际关系图谱 - WeChat Mini Program for Interpersonal Relationship Mapping",
   "packOptions": {
     "ignore": [],
     "include": []
@@ -42,7 +42,7 @@
   "compileType": "miniprogram",
   "libVersion": "2.32.0",
   "appid": "testappid",
-  "projectname": "guanxi-wechat-mini-program",
+  "projectname": "interpersonal-relationship-map",
   "miniprogramRoot": "miniprogram/",
   "condition": {}
 }

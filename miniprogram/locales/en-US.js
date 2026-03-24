@@ -192,7 +192,7 @@ module.exports = {
 
   pages: {
     index: {
-      title: 'Guanxi Network',
+      title: 'Interpersonal Relationship Graph',
       subtitle: 'Making complex relationships clear',
       stats: {
         characters: 'Characters',

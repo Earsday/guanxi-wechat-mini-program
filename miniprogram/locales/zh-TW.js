@@ -315,7 +315,7 @@ module.exports = {
 
   pages: {
     index: {
-      title: '關係網',
+      title: '人際關係圖譜',
       subtitle: '讓複雜的人際關係變得清晰',
       stats: {
         characters: '人物',

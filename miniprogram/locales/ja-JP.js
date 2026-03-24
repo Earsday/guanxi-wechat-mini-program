@@ -163,7 +163,7 @@ module.exports = {
 
   pages: {
     index: {
-      title: '関係ネットワーク',
+      title: '人間関係グラフ',
       subtitle: '複雑な人間関係を明確に',
       stats: {
         characters: '人物',

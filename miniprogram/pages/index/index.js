@@ -41,6 +41,11 @@ Page({
         t: i18n.getMessages(),
         currentLocale: locale
       });
+      
+      // Set navigation bar title dynamically for i18n support
+      wx.setNavigationBarTitle({
+        title: i18n.t('pages.index.title') || '人际关系图谱'
+      });
     }
   },
 

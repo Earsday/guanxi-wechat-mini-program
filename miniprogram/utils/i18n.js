@@ -1,7 +1,7 @@
 // utils/i18n.js - Internationalization framework
 
 const DEFAULT_LOCALE = 'zh-CN';
-const SUPPORTED_LOCALES = ['zh-CN', 'zh-TW', 'en-US', 'ja-JP'];
+const SUPPORTED_LOCALES = ['zh-CN', 'zh-TW', 'en-US', 'ja-JP', 'ko-KR'];
 
 let currentLocale = DEFAULT_LOCALE;
 let translations = {};
@@ -101,6 +101,9 @@ function loadTranslations(locale) {
         break;
       case 'ja-JP':
         translations = require('../locales/ja-JP.js');
+        break;
+      case 'ko-KR':
+        translations = require('../locales/ko-KR.js');
         break;
       default:
         translations = require('../locales/zh-CN.js');
@@ -218,7 +221,8 @@ function getLocaleName(locale) {
     'zh-CN': t('locale.zhCN') || '简体中文',
     'zh-TW': t('locale.zhTW') || '繁體中文',
     'en-US': t('locale.enUS') || 'English',
-    'ja-JP': t('locale.jaJP') || '日本語'
+    'ja-JP': t('locale.jaJP') || '日本語',
+    'ko-KR': t('locale.koKR') || '한국어'
   };
   return names[locale] || locale;
 }
@@ -231,7 +235,8 @@ function getLocaleNativeName(locale) {
     'zh-CN': '简体中文',
     'zh-TW': '繁體中文',
     'en-US': 'English',
-    'ja-JP': '日本語'
+    'ja-JP': '日本語',
+    'ko-KR': '한국어'
   };
   return nativeNames[locale] || locale;
 }
@@ -271,7 +276,7 @@ function formatCurrency(amount, currency = 'CNY') {
   const symbol = symbols[currency] || currency;
   const formatted = formatNumber(amount, { decimals: 2 });
 
-  if (currentLocale === 'zh-CN' || currentLocale === 'zh-TW' || currentLocale === 'ja-JP') {
+  if (currentLocale === 'zh-CN' || currentLocale === 'zh-TW' || currentLocale === 'ja-JP' || currentLocale === 'ko-KR') {
     return `${symbol}${formatted}`;
   } else {
     return `${symbol}${formatted}`;
