@@ -1,50 +1,109 @@
 <!--pages/index/index.wxml-->
 <view class="container">
-  <!-- Header -->
+  <!-- Header Section -->
   <view class="header">
-    <text class="title">关系网</text>
-    <text class="subtitle">让复杂的人际关系变得清晰</text>
+    <view class="header-content">
+      <text class="title">{{t.pages.index.title}}</text>
+      <text class="subtitle">{{t.pages.index.subtitle}}</text>
+    </view>
+    <view class="header-decoration"></view>
   </view>
 
-  <!-- Statistics -->
-  <view class="stats-container">
-    <view class="stat-item">
-      <text class="stat-number">{{stats.characterCount}}</text>
-      <text class="stat-label">人物</text>
+  <!-- Loading State with Skeleton -->
+  <skeleton
+    wx:if="{{loading}}"
+    type="stats"
+    rows="3"
+    animated="{{true}}"
+  />
+
+  <!-- Stats Section with Stat Cards -->
+  <view wx:elif="{{!loading}}" class="stats-section">
+    <view class="stats-grid">
+      <stat-card
+        label="{{t.pages.index.stats.characters}}"
+        value="{{stats.characterCount}}"
+        icon="👥"
+        color="primary"
+        size="medium"
+        clickable="{{true}}"
+        bindtap="goToCharacterList"
+      />
+      
+      <stat-card
+        label="{{t.pages.index.stats.relationships}}"
+        value="{{stats.guanxiCount}}"
+        icon="🔗"
+        color="success"
+        size="medium"
+        clickable="{{true}}"
+        bindtap="goToGuanxiList"
+      />
+      
+      <stat-card
+        label="{{t.pages.index.stats.types}}"
+        value="{{stats.typeCount}}"
+        icon="📋"
+        color="warning"
+        size="medium"
+      />
     </view>
-    <view class="stat-item">
-      <text class="stat-number">{{stats.guanxiCount}}</text>
-      <text class="stat-label">关系</text>
+  </view>
+
+  <!-- Recent Types Section -->
+  <view class="types-section" wx:if="{{types.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">{{t.pages.index.recentTypes || '常用关系类型'}}</text>
+      <text class="section-more" bindtap="goToTypeList">{{t.common.viewMore || '查看更多'}} ></text>
     </view>
-    <view class="stat-item">
-      <text class="stat-number">{{stats.typeCount}}</text>
-      <text class="stat-label">关系类型</text>
+    <view class="type-list">
+      <view class="type-card" wx:for="{{types}}" wx:key="id">
+        <view class="type-icon">{{item.icon || '📌'}}</view>
+        <view class="type-info">
+          <text class="type-name">{{item.displayName}}</text>
+          <text class="type-category">{{item.category}}</text>
+        </view>
+      </view>
     </view>
   </view>
 
   <!-- Quick Actions -->
-  <view class="actions-container">
-    <view class="card action-card" bindtap="goToCharacterList">
-      <text class="action-icon">👤</text>
-      <text class="action-title">管理人物</text>
-      <text class="action-desc">添加或查看人物信息</text>
+  <view class="actions-section">
+    <view class="section-header">
+      <text class="section-title">{{t.pages.index.quickActions || '快捷操作'}}</text>
     </view>
-
-    <view class="card action-card" bindtap="goToCreateGuanxi">
-      <text class="action-icon">🔗</text>
-      <text class="action-title">创建关系</text>
-      <text class="action-desc">建立人物之间的关系</text>
+    
+    <view class="actions-grid">
+      <view class="action-card" bindtap="goToCharacterEdit">
+        <view class="action-icon primary-gradient">➕</view>
+        <text class="action-title">{{t.pages.index.actions.manageCharacters}}</text>
+        <text class="action-desc">{{t.pages.index.actions.manageCharactersDesc}}</text>
+      </view>
+      
+      <view class="action-card" bindtap="goToCreateGuanxi">
+        <view class="action-icon success-gradient">🔗</view>
+        <text class="action-title">{{t.pages.index.actions.createRelationship}}</text>
+        <text class="action-desc">{{t.pages.index.actions.createRelationshipDesc}}</text>
+      </view>
+      
+      <view class="action-card" bindtap="goToGraph">
+        <view class="action-icon warning-gradient">🕸️</view>
+        <text class="action-title">{{t.pages.index.actions.viewGraph}}</text>
+        <text class="action-desc">{{t.pages.index.actions.viewGraphDesc}}</text>
+      </view>
+      
+      <view class="action-card" bindtap="goToSearch">
+        <view class="action-icon info-gradient">🔍</view>
+        <text class="action-title">{{t.pages.index.actions.search || '搜索人物'}}</text>
+        <text class="action-desc">{{t.pages.index.actions.searchDesc || '快速查找人物信息'}}</text>
+      </view>
     </view>
   </view>
 
-  <!-- Relationship Types Preview -->
-  <view class="types-section" wx:if="{{types.length > 0}}">
-    <text class="section-title">关系类型</text>
-    <view class="types-list">
-      <view class="type-item" wx:for="{{types}}" wx:key="id">
-        <text class="type-icon">{{item.icon}}</text>
-        <text class="type-name">{{item.name}}</text>
-      </view>
-    </view>
+  <!-- Empty State -->
+  <view wx:if="{{!loading && stats.characterCount === 0}}" class="empty-state">
+    <view class="empty-icon">📝</view>
+    <text class="empty-title">{{t.pages.index.empty || '还没有添加人物'}}</text>
+    <text class="empty-desc">{{t.pages.index.emptyDesc || '点击上方按钮开始添加第一个人物'}}</text>
   </view>
 </view>

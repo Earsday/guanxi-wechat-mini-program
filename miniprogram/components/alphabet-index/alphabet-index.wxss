@@ -1,0 +1,111 @@
+/* components/alphabet-index/alphabet-index.wxss */
+
+.alphabet-index-container {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 999;
+  pointer-events: none;
+}
+
+/* Index bar */
+.alphabet-index-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8rpx 8rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 24rpx 0 0 24rpx;
+  box-shadow: -2rpx 0 8rpx rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+}
+
+/* Index item */
+.index-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32rpx;
+  height: 32rpx;
+  font-size: 20rpx;
+  color: #606266;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.index-item.active {
+  font-weight: 600;
+  font-size: 24rpx;
+  transform: scale(1.2);
+}
+
+/* Indicator popup */
+.index-indicator {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 120rpx;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(25, 137, 250, 0.9);
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  animation: fadeIn 0.2s ease;
+}
+
+.indicator-text {
+  font-size: 64rpx;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Touch feedback */
+.alphabet-index-bar:active {
+  background: rgba(255, 255, 255, 1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 750rpx) {
+  .index-item {
+    width: 28rpx;
+    height: 28rpx;
+    font-size: 18rpx;
+  }
+  
+  .index-indicator {
+    width: 100rpx;
+    height: 100rpx;
+  }
+  
+  .indicator-text {
+    font-size: 56rpx;
+  }
+}
+
+/* Dark mode support (if needed) */
+@media (prefers-color-scheme: dark) {
+  .alphabet-index-bar {
+    background: rgba(30, 30, 30, 0.9);
+  }
+  
+  .index-item {
+    color: #909399;
+  }
+}

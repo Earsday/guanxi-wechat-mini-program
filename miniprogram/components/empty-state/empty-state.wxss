@@ -1,0 +1,132 @@
+/* components/empty-state/empty-state.wxss */
+.empty-state {
+  width: 100%;
+  min-height: 400rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 40rpx;
+}
+
+.empty-state-content {
+  text-align: center;
+  max-width: 500rpx;
+}
+
+/* Icon */
+.empty-icon {
+  margin-bottom: 32rpx;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.icon-emoji {
+  font-size: 120rpx;
+  line-height: 1;
+  display: inline-block;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+/* Title */
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+  animation: fadeIn 0.6s ease-out 0.1s both;
+}
+
+/* Description */
+.empty-description {
+  font-size: 28rpx;
+  color: #999;
+  line-height: 1.6;
+  margin-bottom: 40rpx;
+  animation: fadeIn 0.7s ease-out 0.2s both;
+}
+
+/* Action Button */
+.empty-action {
+  animation: fadeIn 0.8s ease-out 0.3s both;
+}
+
+.action-button {
+  display: inline-block;
+  padding: 24rpx 48rpx;
+  background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, #764ba2 100%);
+  color: white;
+  font-size: 28rpx;
+  font-weight: 500;
+  border-radius: 48rpx;
+  box-shadow: 0 8rpx 16rpx rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.action-button:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 8rpx rgba(102, 126, 234, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10rpx);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .empty-title {
+    color: #e0e0e0;
+  }
+  
+  .empty-description {
+    color: #999;
+  }
+  
+  .action-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 8rpx 16rpx rgba(102, 126, 234, 0.4);
+  }
+  
+  .action-button:active {
+    box-shadow: 0 4rpx 8rpx rgba(102, 126, 234, 0.4);
+  }
+}
+
+/* Responsive adjustments */
+.empty-state-content {
+  width: 100%;
+}
+
+@media screen and (max-width: 375px) {
+  .icon-emoji {
+    font-size: 100rpx;
+  }
+  
+  .empty-title {
+    font-size: 30rpx;
+  }
+  
+  .empty-description {
+    font-size: 26rpx;
+  }
+  
+  .action-button {
+    font-size: 26rpx;
+    padding: 20rpx 40rpx;
+  }
+}

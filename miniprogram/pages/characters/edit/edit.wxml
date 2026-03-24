@@ -1,0 +1,204 @@
+<!-- pages/characters/edit/edit.wxml -->
+<view class="edit-page">
+  <scroll-view class="form-container" scroll-y>
+    
+    <!-- Avatar Section -->
+    <view class="section avatar-section">
+      <view class="section-title">{{t.avatarLabel}}</view>
+      <view class="avatar-uploader" bindtap="onChooseAvatar">
+        <image wx:if="{{formData.avatarUrl}}" class="avatar-preview" src="{{formData.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar-placeholder">
+          <text class="icon">👤</text>
+        </view>
+        <view class="avatar-btn">
+          {{formData.avatarUrl ? t.changeAvatar : t.uploadAvatar}}
+        </view>
+      </view>
+    </view>
+
+    <!-- Basic Information -->
+    <view class="section">
+      <view class="section-title">{{t.basicInfo}}</view>
+      
+      <!-- Name (Required) -->
+      <view class="form-item required">
+        <view class="label">{{t.nameLabel}}</view>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="{{t.namePlaceholder}}"
+          value="{{formData.name}}"
+          bindinput="onNameInput"
+          maxlength="50"
+        />
+      </view>
+
+      <!-- Alias -->
+      <view class="form-item">
+        <view class="label">{{t.aliasLabel}}</view>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="{{t.aliasPlaceholder}}"
+          value="{{formData.alias}}"
+          bindinput="onAliasInput"
+          maxlength="50"
+        />
+      </view>
+
+      <!-- Gender (Required) -->
+      <view class="form-item required">
+        <view class="label">{{t.genderLabel}}</view>
+        <picker 
+          class="picker" 
+          mode="selector" 
+          range="{{genderOptions}}"
+          range-key="label"
+          value="{{formData.gender}}"
+          bindchange="onGenderChange"
+        >
+          <view class="picker-text {{formData.gender ? '' : 'placeholder'}}">
+            <text wx:if="{{formData.gender}}">
+              {{genderOptions[genderOptions.findIndex(item => item.value === formData.gender)].label}}
+            </text>
+            <text wx:else>{{t.genderRequired}}</text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- Birthday -->
+      <view class="form-item">
+        <view class="label">{{t.birthdayLabel}}</view>
+        <picker 
+          class="picker" 
+          mode="date" 
+          value="{{formData.birthday}}"
+          bindchange="onBirthdayChange"
+        >
+          <view class="picker-text {{formData.birthday ? '' : 'placeholder'}}">
+            {{formData.birthday || t.birthdayPlaceholder}}
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- Contact Information -->
+    <view class="section">
+      <view class="section-title">{{t.contactInfo}}</view>
+      
+      <!-- Phone -->
+      <view class="form-item">
+        <view class="label">{{t.phoneLabel}}</view>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="{{t.phonePlaceholder}}"
+          value="{{formData.contacts.phone}}"
+          bindinput="onPhoneInput"
+          maxlength="20"
+        />
+      </view>
+
+      <!-- Email -->
+      <view class="form-item">
+        <view class="label">{{t.emailLabel}}</view>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="{{t.emailPlaceholder}}"
+          value="{{formData.contacts.email}}"
+          bindinput="onEmailInput"
+          maxlength="100"
+        />
+      </view>
+
+      <!-- WeChat -->
+      <view class="form-item">
+        <view class="label">{{t.wechatLabel}}</view>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="{{t.wechatPlaceholder}}"
+          value="{{formData.contacts.im.wechat}}"
+          bindinput="onWechatInput"
+          maxlength="50"
+        />
+      </view>
+
+      <!-- QQ -->
+      <view class="form-item">
+        <view class="label">{{t.qqLabel}}</view>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="{{t.qqPlaceholder}}"
+          value="{{formData.contacts.im.qq}}"
+          bindinput="onQQInput"
+          maxlength="20"
+        />
+      </view>
+    </view>
+
+    <!-- Additional Information -->
+    <view class="section">
+      <view class="section-title">{{t.additionalInfo}}</view>
+      
+      <!-- Tags -->
+      <view class="form-item">
+        <view class="label">{{t.tagsLabel}}</view>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="{{t.tagsPlaceholder}}"
+          value="{{formData.tags}}"
+          bindinput="onTagsInput"
+          maxlength="200"
+        />
+      </view>
+
+      <!-- Group -->
+      <view class="form-item">
+        <view class="label">{{t.groupLabel}}</view>
+        <input 
+          class="input" 
+          type="text" 
+          placeholder="{{t.groupPlaceholder}}"
+          value="{{formData.group}}"
+          bindinput="onGroupInput"
+          maxlength="50"
+        />
+      </view>
+
+      <!-- Notes -->
+      <view class="form-item">
+        <view class="label">{{t.notesLabel}}</view>
+        <textarea 
+          class="textarea" 
+          placeholder="{{t.notesPlaceholder}}"
+          value="{{formData.notes}}"
+          bindinput="onNotesInput"
+          maxlength="500"
+          auto-height
+        />
+      </view>
+    </view>
+
+    <!-- Bottom spacing for buttons -->
+    <view class="bottom-spacing"></view>
+  </scroll-view>
+
+  <!-- Action Buttons -->
+  <view class="action-buttons">
+    <button class="btn btn-cancel" bindtap="onCancel">
+      {{t.cancelButton}}
+    </button>
+    <button 
+      class="btn btn-submit" 
+      bindtap="onSubmit"
+      loading="{{isSubmitting}}"
+      disabled="{{isSubmitting}}"
+    >
+      {{t.submitButton}}
+    </button>
+  </view>
+</view>

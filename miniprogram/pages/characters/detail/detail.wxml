@@ -1,52 +1,315 @@
 <!--pages/characters/detail/detail.wxml-->
-<view class="container" wx:if="{{character}}">
-  <!-- Character info card -->
-  <view class="card character-header">
-    <text class="character-name">{{character.name}}</text>
-    <view class="character-tags">
-      <text class="tag" wx:if="{{character.age}}">{{character.age}}岁</text>
-      <text class="tag" wx:if="{{character.gender}}">
-        {{character.gender === 'male' ? '男' : '女'}}
-      </text>
-      <text class="tag" wx:if="{{character.chineseZodiac}}">{{character.chineseZodiac}}</text>
-    </view>
-  </view>
+<!-- Loading skeleton -->
+<skeleton
+  wx:if="{{loading}}"
+  type="profile"
+  rows="6"
+  animated="{{true}}"
+/>
 
-  <!-- Basic info -->
-  <view class="card info-section" wx:if="{{character.phone || character.email}}">
-    <text class="section-title">联系方式</text>
-    <view class="info-item" wx:if="{{character.phone}}">
-      <text class="info-label">手机号：</text>
-      <text class="info-value">{{character.phone}}</text>
-    </view>
-    <view class="info-item" wx:if="{{character.email}}">
-      <text class="info-label">邮箱：</text>
-      <text class="info-value">{{character.email}}</text>
-    </view>
-  </view>
-
-  <!-- Relationships -->
-  <view class="card relationships-section">
-    <text class="section-title">关系（{{relationships.length}}）</text>
-    <view class="relationships-list" wx:if="{{relationships.length > 0}}">
-      <view class="relationship-item" wx:for="{{relationships}}" wx:key="id">
-        <text class="relationship-type">{{item.typeName || '未知类型'}}</text>
+<view class="container" wx:if="{{!loading && character}}">
+  <!-- Header with gradient background -->
+  <view class="header-gradient">
+    <view class="character-header">
+      <!-- Avatar -->
+      <view class="character-avatar">
+        <text class="avatar-text">{{character.name ? character.name.charAt(0) : '?'}}</text>
+      </view>
+      
+      <!-- Name and basic info -->
+      <text class="character-name">{{character.name}}</text>
+      <text class="character-alias" wx:if="{{character.alias}}">（{{character.alias}}）</text>
+      
+      <!-- Tags -->
+      <view class="character-tags">
+        <text class="tag" wx:if="{{character.gender}}">
+          {{character.gender === 'male' ? '👨' : '👩'}}
+          {{character.gender === 'male' ? t.character.gender.male : t.character.gender.female}}
+        </text>
+        <text class="tag" wx:if="{{character.age}}">
+          🎂 {{character.age}}{{t.pages.characterList.ageUnit}}
+        </text>
+        <text class="tag" wx:if="{{character.group}}">
+          📁 {{character.group}}
+        </text>
       </view>
     </view>
-    <view class="empty-hint" wx:else>
-      <text>暂无关系</text>
+  </view>
+
+  <!-- Stats cards -->
+  <view class="stats-section">
+    <view class="stats-grid">
+      <stat-card
+        label="{{t.pages.characterDetail.stats.relationships || '关系数量'}}"
+        value="{{stats.relationshipCount}}"
+        icon="🔗"
+        color="primary"
+        size="small"
+        clickable="{{true}}"
+        data-tab="relationships"
+        bindtap="onTabChange"
+      />
+      <stat-card
+        label="{{t.pages.characterDetail.stats.events || '事件记录'}}"
+        value="{{stats.eventCount}}"
+        icon="📅"
+        color="info"
+        size="small"
+        clickable="{{true}}"
+        data-tab="timeline"
+        bindtap="onTabChange"
+      />
+      <stat-card
+        label="{{t.pages.characterDetail.stats.daysSince || '认识天数'}}"
+        value="{{stats.daysSinceCreated}}"
+        icon="⏱️"
+        color="success"
+        size="small"
+        unit="{{t.pages.characterDetail.stats.days || '天'}}"
+      />
+      <stat-card
+        wx:if="{{stats.lastContactDays !== null}}"
+        label="{{t.pages.characterDetail.stats.lastContact || '最后联系'}}"
+        value="{{stats.lastContactDays}}"
+        icon="💬"
+        color="warning"
+        size="small"
+        unit="{{t.pages.characterDetail.stats.daysAgo || '天前'}}"
+      />
     </view>
   </view>
 
-  <!-- Notes -->
-  <view class="card notes-section" wx:if="{{character.notes}}">
-    <text class="section-title">备注</text>
-    <text class="notes-text">{{character.notes}}</text>
+  <!-- Tab navigation -->
+  <view class="tabs">
+    <view 
+      class="tab-item {{activeTab === 'overview' ? 'active' : ''}}"
+      data-tab="overview"
+      bindtap="onTabChange"
+    >
+      <text class="tab-icon">📋</text>
+      <text class="tab-label">{{t.pages.characterDetail.tabs.overview || '概览'}}</text>
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'relationships' ? 'active' : ''}}"
+      data-tab="relationships"
+      bindtap="onTabChange"
+    >
+      <text class="tab-icon">🔗</text>
+      <text class="tab-label">{{t.pages.characterDetail.tabs.relationships || '关系'}}</text>
+    </view>
+    <view 
+      class="tab-item {{activeTab === 'timeline' ? 'active' : ''}}"
+      data-tab="timeline"
+      bindtap="onTabChange"
+    >
+      <text class="tab-icon">📅</text>
+      <text class="tab-label">{{t.pages.characterDetail.tabs.timeline || '时间线'}}</text>
+    </view>
   </view>
 
-  <!-- Actions -->
-  <view class="actions">
-    <button class="btn-action" bindtap="onEdit">编辑</button>
-    <button class="btn-action btn-danger" bindtap="onDelete">删除</button>
+  <!-- Content sections -->
+  <view class="content">
+    <!-- Overview tab -->
+    <view class="tab-content" wx:if="{{activeTab === 'overview'}}">
+      <!-- Contact info -->
+      <view class="card info-section" wx:if="{{character.phone || character.email || character.contacts}}">
+        <view class="section-header">
+          <text class="section-icon">📞</text>
+          <text class="section-title">{{t.pages.characterDetail.contactInfo}}</text>
+        </view>
+        
+        <view class="info-list">
+          <view class="info-item" wx:if="{{character.phone}}">
+            <text class="info-label">{{t.pages.characterDetail.phoneLabel}}</text>
+            <text class="info-value">{{character.phone}}</text>
+            <view class="info-action" catchtap="copyPhone">📋</view>
+          </view>
+          
+          <view class="info-item" wx:if="{{character.email}}">
+            <text class="info-label">{{t.pages.characterDetail.emailLabel}}</text>
+            <text class="info-value">{{character.email}}</text>
+            <view class="info-action" catchtap="copyEmail">📋</view>
+          </view>
+          
+          <view class="info-item" wx:if="{{character.contacts && character.contacts.im && character.contacts.im.wechat}}">
+            <text class="info-label">{{t.pages.characterDetail.wechatLabel || '微信：'}}</text>
+            <text class="info-value">{{character.contacts.im.wechat}}</text>
+            <view class="info-action" catchtap="copyWechat">📋</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Quick relationship overview -->
+      <view class="card quick-relationships" wx:if="{{relationshipsByCategory.length > 0}}">
+        <view class="section-header">
+          <text class="section-icon">🔗</text>
+          <text class="section-title">{{t.pages.characterDetail.relationshipOverview || '关系概览'}}</text>
+        </view>
+        
+        <view class="category-grid">
+          <view 
+            class="category-card"
+            wx:for="{{relationshipsByCategory}}"
+            wx:key="category"
+          >
+            <text class="category-icon">{{getCategoryIcon(item.category)}}</text>
+            <text class="category-count">{{item.count}}</text>
+            <text class="category-name">{{item.categoryName}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- Notes -->
+      <view class="card notes-section" wx:if="{{character.notes}}">
+        <view class="section-header">
+          <text class="section-icon">📝</text>
+          <text class="section-title">{{t.pages.characterDetail.notes}}</text>
+        </view>
+        <text class="notes-text">{{character.notes}}</text>
+      </view>
+
+      <!-- Quick actions -->
+      <view class="card quick-actions">
+        <view class="action-grid">
+          <view class="action-item" bindtap="onAddRelationship">
+            <view class="action-icon-wrapper primary-gradient">
+              <text class="action-icon">➕</text>
+            </view>
+            <text class="action-label">{{t.pages.characterDetail.actions.addRelationship || '添加关系'}}</text>
+          </view>
+          
+          <view class="action-item" bindtap="onViewGraph">
+            <view class="action-icon-wrapper success-gradient">
+              <text class="action-icon">🕸️</text>
+            </view>
+            <text class="action-label">{{t.pages.characterDetail.actions.viewGraph || '关系图谱'}}</text>
+          </view>
+          
+          <view class="action-item" bindtap="onEdit">
+            <view class="action-icon-wrapper info-gradient">
+              <text class="action-icon">✏️</text>
+            </view>
+            <text class="action-label">{{t.common.edit}}</text>
+          </view>
+          
+          <view class="action-item" bindtap="onShare">
+            <view class="action-icon-wrapper warning-gradient">
+              <text class="action-icon">📤</text>
+            </view>
+            <text class="action-label">{{t.pages.characterDetail.actions.share || '分享'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Relationships tab -->
+    <view class="tab-content" wx:if="{{activeTab === 'relationships'}}">
+      <view class="card relationships-section">
+        <view class="section-header">
+          <text class="section-icon">🔗</text>
+          <text class="section-title">{{t.pages.characterDetail.relationships}}（{{relationships.length}}）</text>
+          <view class="section-action" bindtap="onAddRelationship">
+            <text class="action-plus">+</text>
+          </view>
+        </view>
+        
+        <!-- Group by type -->
+        <view class="relationships-grouped" wx:if="{{relationshipsByType.length > 0}}">
+          <block wx:for="{{relationshipsByType}}" wx:key="typeName" wx:for-item="group">
+            <view class="type-group">
+              <view class="type-header">
+                <text class="type-name">{{group.typeName}}</text>
+                <text class="type-count">{{group.count}}</text>
+              </view>
+              
+              <view class="relationship-list">
+                <view 
+                  class="relationship-card"
+                  wx:for="{{group.items}}"
+                  wx:key="id"
+                  wx:for-item="relationship"
+                  data-id="{{relationship.id}}"
+                  bindtap="onRelationshipTap"
+                >
+                  <!-- Other character info -->
+                  <view 
+                    class="relationship-character"
+                    data-id="{{relationship.otherCharacter.id}}"
+                    catchtap="onCharacterTap"
+                  >
+                    <view class="rel-avatar">
+                      <text class="rel-avatar-text">{{relationship.otherCharacter.name.charAt(0)}}</text>
+                    </view>
+                    <view class="rel-info">
+                      <text class="rel-name">{{relationship.otherCharacter.name}}</text>
+                      <text class="rel-meta" wx:if="{{relationship.otherCharacter.age}}">
+                        {{relationship.otherCharacter.age}}{{t.pages.characterList.ageUnit}}
+                      </text>
+                    </view>
+                  </view>
+                  
+                  <!-- Relationship details -->
+                  <view class="rel-details">
+                    <text class="rel-direction">{{relationship.direction === 'outgoing' ? '→' : '←'}}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </block>
+        </view>
+        
+        <!-- Empty state -->
+        <view class="empty-state" wx:else>
+          <text class="empty-icon">🔗</text>
+          <text class="empty-text">{{t.pages.characterDetail.noRelationships}}</text>
+          <view class="empty-action" bindtap="onAddRelationship">
+            <text class="empty-action-icon">+</text>
+            <text class="empty-action-text">{{t.pages.characterDetail.actions.addRelationship || '添加关系'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Timeline tab -->
+    <view class="tab-content" wx:if="{{activeTab === 'timeline'}}">
+      <view class="card timeline-section">
+        <view class="section-header">
+          <text class="section-icon">📅</text>
+          <text class="section-title">{{t.pages.characterDetail.timeline || '时间线'}}（{{events.length}}）</text>
+        </view>
+        
+        <timeline
+          wx:if="{{events.length > 0}}"
+          items="{{events}}"
+          mode="vertical"
+          showTime="{{true}}"
+          showIcons="{{true}}"
+          highlightCurrent="{{true}}"
+        />
+        
+        <view class="empty-state" wx:else>
+          <text class="empty-icon">📅</text>
+          <text class="empty-text">{{t.pages.characterDetail.noEvents || '暂无事件记录'}}</text>
+        </view>
+      </view>
+    </view>
   </view>
+
+  <!-- Fixed action buttons -->
+  <view class="actions">
+    <button class="btn-action btn-edit" bindtap="onEdit">
+      <text class="btn-icon">✏️</text>
+      <text>{{t.common.edit}}</text>
+    </button>
+    <button class="btn-action btn-danger" bindtap="onDelete">
+      <text class="btn-icon">🗑️</text>
+      <text>{{t.common.delete}}</text>
+    </button>
+  </view>
+</view>
+
+<!-- Loading state -->
+<view class="loading-container" wx:if="{{loading}}">
+  <view class="loading-spinner"></view>
+  <text class="loading-text">{{t.common.loading || '加载中...'}}</text>
 </view>

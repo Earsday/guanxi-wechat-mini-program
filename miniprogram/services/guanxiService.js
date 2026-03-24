@@ -1,128 +1,377 @@
 // services/guanxiService.js - Relationship management
 
-const storage = require('./storage.js');
-const eventBus = require('../utils/eventBus.js');
+const { db, OBJECT_STORES } = require('./indexedDB.js');
 
 /**
- * Get all relationships
- */
-async function getAllGuanxi() {
-  return await storage.getAll(storage.STORAGE_KEYS.GUANXI);
-}
-
-/**
- * Get relationships for a character
+ * Get all relationships for a character
  */
 async function getGuanxiByCharacter(characterId) {
-  const allGuanxi = await getAllGuanxi();
-
-  return allGuanxi.filter(guanxi => {
-    return guanxi.fromCharacterId === characterId || guanxi.toCharacterId === characterId;
-  });
+  const outgoing = await db.query(OBJECT_STORES.GUANXI, { fromCharacterId: characterId });
+  const incoming = await db.query(OBJECT_STORES.GUANXI, { toCharacterId: characterId });
+  
+  return [...outgoing, ...incoming];
 }
 
 /**
  * Create new relationship
  */
 async function createGuanxi(guanxiData) {
-  // Emit before_create event
-  eventBus.emit('before_create', guanxiData);
+  const userId = guanxiData.userId || 1;
 
   // Validate required fields
-  if (!guanxiData.fromCharacterId || !guanxiData.toCharacterId) {
-    throw new Error('fromCharacterId and toCharacterId are required');
+  if (!guanxiData.fromCharacterId || !guanxiData.toCharacterId || !guanxiData.typeId) {
+    throw new Error('fromCharacterId, toCharacterId, and typeId are required');
   }
 
-  if (!guanxiData.typeId) {
-    throw new Error('typeId is required');
+  // Check if relationship already exists
+  const exists = await relationshipExists(
+    guanxiData.fromCharacterId,
+    guanxiData.toCharacterId,
+    guanxiData.typeId
+  );
+
+  if (exists) {
+    throw new Error('Relationship already exists between these characters');
   }
 
-  // Ensure direction is set
-  if (!guanxiData.direction) {
-    guanxiData.direction = 'forward';
-  }
+  const newGuanxi = {
+    userId,
+    fromCharacterId: guanxiData.fromCharacterId,
+    toCharacterId: guanxiData.toCharacterId,
+    typeId: guanxiData.typeId,
+    
+    // Periods (for multi-period relationships)
+    periods: guanxiData.periods || [],
+    
+    // Type-specific attributes
+    attributes: guanxiData.attributes || {},
+    
+    // Contact tracking
+    lastContactTime: guanxiData.lastContactTime || null,
+    contactFrequency: guanxiData.contactFrequency || null,
+    
+    // Relationship deduction
+    isDeduced: guanxiData.isDeduced || false,
+    deductionChain: guanxiData.deductionChain || [],
+    deductionConfidence: guanxiData.deductionConfidence || null,
+    
+    // Notes and tags
+    note: guanxiData.note || '',
+    tags: guanxiData.tags || [],
+    
+    // Privacy
+    isPrivate: guanxiData.isPrivate || false,
+    
+    // Cloud sync
+    cloudSynced: false,
+    cloudId: guanxiData.cloudId || '',
+    lastSyncAt: 0
+  };
 
-  // Add relationship
-  const guanxi = await storage.add(storage.STORAGE_KEYS.GUANXI, guanxiData);
+  const created = await db.add(OBJECT_STORES.GUANXI, newGuanxi);
 
-  // Emit after_create event
-  eventBus.emit('after_create', guanxi);
+  // Update character statistics
+  await updateCharacterStats(guanxiData.fromCharacterId);
+  await updateCharacterStats(guanxiData.toCharacterId);
 
-  return guanxi;
+  // Emit event for relationship creation (for deduction system)
+  const eventBus = require('../utils/eventBus.js');
+  eventBus.emit('guanxi:created', created);
+
+  return created;
 }
 
 /**
  * Update relationship
  */
 async function updateGuanxi(id, updates) {
-  const guanxi = await storage.update(storage.STORAGE_KEYS.GUANXI, id, updates);
+  const existing = await db.getById(OBJECT_STORES.GUANXI, id);
+  
+  if (!existing) {
+    throw new Error(`Guanxi with id ${id} not found`);
+  }
 
-  eventBus.emit('after_update', guanxi);
+  const updated = {
+    ...existing,
+    ...updates,
+    updatedAt: Date.now()
+  };
 
-  return guanxi;
+  await db.update(OBJECT_STORES.GUANXI, id, updated);
+
+  // Emit event for relationship update
+  const eventBus = require('../utils/eventBus.js');
+  eventBus.emit('guanxi:updated', updated);
+
+  return updated;
 }
 
 /**
  * Delete relationship
  */
 async function deleteGuanxi(id) {
-  const result = await storage.deleteItem(storage.STORAGE_KEYS.GUANXI, id);
+  const guanxi = await db.getById(OBJECT_STORES.GUANXI, id);
+  
+  if (!guanxi) {
+    throw new Error(`Guanxi with id ${id} not found`);
+  }
 
-  eventBus.emit('after_delete', { id });
+  await db.delete(OBJECT_STORES.GUANXI, id);
 
-  return result;
+  // Update character statistics
+  await updateCharacterStats(guanxi.fromCharacterId);
+  await updateCharacterStats(guanxi.toCharacterId);
+
+  // Emit event for relationship deletion
+  const eventBus = require('../utils/eventBus.js');
+  eventBus.emit('guanxi:deleted', guanxi);
 }
 
 /**
- * Add period to relationship
+ * Add a period to relationship (for multi-period support)
  */
 async function addPeriod(guanxiId, periodData) {
-  const allGuanxi = await getAllGuanxi();
-  const guanxi = allGuanxi.find(g => g.id === guanxiId);
-
+  const guanxi = await db.getById(OBJECT_STORES.GUANXI, guanxiId);
+  
   if (!guanxi) {
     throw new Error(`Guanxi with id ${guanxiId} not found`);
   }
 
-  if (!guanxi.periods) {
-    guanxi.periods = [];
-  }
-
   const period = {
-    id: storage.generateId(),
-    ...periodData,
-    createdAt: new Date().toISOString()
+    id: Date.now(), // Simple timestamp-based ID for periods
+    startTime: periodData.startTime,
+    endTime: periodData.endTime || null,
+    attributes: periodData.attributes || {},
+    note: periodData.note || ''
   };
 
-  guanxi.periods.push(period);
-  guanxi.updatedAt = new Date().toISOString();
-
-  await storage.set(storage.STORAGE_KEYS.GUANXI, allGuanxi);
+  const updatedPeriods = [...(guanxi.periods || []), period];
+  
+  await db.update(OBJECT_STORES.GUANXI, guanxiId, {
+    ...guanxi,
+    periods: updatedPeriods,
+    updatedAt: Date.now()
+  });
 
   return period;
 }
 
 /**
- * Check if relationship exists between two characters
+ * End current period of relationship
  */
-async function relationshipExists(fromCharacterId, toCharacterId, typeId) {
-  const allGuanxi = await getAllGuanxi();
+async function endPeriod(guanxiId, endTime, note = '') {
+  const guanxi = await db.getById(OBJECT_STORES.GUANXI, guanxiId);
+  
+  if (!guanxi) {
+    throw new Error(`Guanxi with id ${guanxiId} not found`);
+  }
 
-  return allGuanxi.some(guanxi => {
-    return (
-      guanxi.fromCharacterId === fromCharacterId &&
-      guanxi.toCharacterId === toCharacterId &&
-      guanxi.typeId === typeId
-    );
+  // Find the active period (no endTime)
+  const periods = guanxi.periods || [];
+  const activePeriodIndex = periods.findIndex(p => !p.endTime);
+
+  if (activePeriodIndex === -1) {
+    throw new Error('No active period found to end');
+  }
+
+  periods[activePeriodIndex].endTime = endTime;
+  periods[activePeriodIndex].note = note;
+
+  await db.update(OBJECT_STORES.GUANXI, guanxiId, {
+    ...guanxi,
+    periods,
+    updatedAt: Date.now()
   });
 }
 
+/**
+ * Query relationships with filters
+ */
+async function queryGuanxi(filter = {}, pagination = {}) {
+  const userId = filter.userId || 1;
+  const conditions = { userId, ...filter };
+  
+  const options = {
+    skip: pagination.offset || 0,
+    limit: pagination.limit || 100
+  };
+
+  return await db.query(OBJECT_STORES.GUANXI, conditions, options);
+}
+
+/**
+ * Get relationship by ID with options
+ */
+async function getGuanxi(id, options = {}) {
+  const guanxi = await db.getById(OBJECT_STORES.GUANXI, id);
+  
+  if (!guanxi) {
+    return null;
+  }
+
+  // Optionally include character details
+  if (options.includeCharacters) {
+    const characterService = require('./characterService.js');
+    guanxi.fromCharacter = await characterService.getCharacterById(guanxi.fromCharacterId);
+    guanxi.toCharacter = await characterService.getCharacterById(guanxi.toCharacterId);
+  }
+
+  // Optionally include type details
+  if (options.includeType) {
+    const typeService = require('./typeService.js');
+    guanxi.type = await typeService.getTypeById(guanxi.typeId);
+  }
+
+  return guanxi;
+}
+
+/**
+ * Find relationship path between two characters (BFS algorithm)
+ */
+async function findPath(fromCharacterId, toCharacterId, maxDepth = 6) {
+  if (fromCharacterId === toCharacterId) {
+    return {
+      found: true,
+      path: [fromCharacterId],
+      relationships: [],
+      depth: 0
+    };
+  }
+
+  const visited = new Set();
+  const queue = [{ characterId: fromCharacterId, path: [fromCharacterId], relationships: [] }];
+  
+  while (queue.length > 0) {
+    const current = queue.shift();
+    
+    if (current.path.length - 1 >= maxDepth) {
+      continue;
+    }
+
+    if (visited.has(current.characterId)) {
+      continue;
+    }
+    
+    visited.add(current.characterId);
+
+    // Get all relationships from current character
+    const relationships = await getGuanxiByCharacter(current.characterId);
+
+    for (const rel of relationships) {
+      const nextCharacterId = rel.fromCharacterId === current.characterId 
+        ? rel.toCharacterId 
+        : rel.fromCharacterId;
+
+      if (nextCharacterId === toCharacterId) {
+        return {
+          found: true,
+          path: [...current.path, nextCharacterId],
+          relationships: [...current.relationships, rel],
+          depth: current.path.length
+        };
+      }
+
+      if (!visited.has(nextCharacterId)) {
+        queue.push({
+          characterId: nextCharacterId,
+          path: [...current.path, nextCharacterId],
+          relationships: [...current.relationships, rel]
+        });
+      }
+    }
+  }
+
+  return {
+    found: false,
+    path: [],
+    relationships: [],
+    depth: -1
+  };
+}
+
+/**
+ * Update contact time for relationship
+ */
+async function updateContactTime(guanxiId, contactTime, note = '') {
+  const guanxi = await db.getById(OBJECT_STORES.GUANXI, guanxiId);
+  
+  if (!guanxi) {
+    throw new Error(`Guanxi with id ${guanxiId} not found`);
+  }
+
+  await db.update(OBJECT_STORES.GUANXI, guanxiId, {
+    ...guanxi,
+    lastContactTime: contactTime,
+    updatedAt: Date.now()
+  });
+
+  // Create event in timeline
+  const eventService = require('./eventService.js');
+  await eventService.createEvent({
+    userId: guanxi.userId,
+    characterId: null,
+    guanxiId: guanxiId,
+    eventType: 'contact',
+    eventTime: contactTime,
+    title: '联系记录',
+    description: note,
+    metadata: {
+      fromCharacterId: guanxi.fromCharacterId,
+      toCharacterId: guanxi.toCharacterId
+    }
+  });
+}
+
+/**
+ * Check if relationship exists
+ */
+async function relationshipExists(fromCharacterId, toCharacterId, typeId) {
+  const results = await db.query(OBJECT_STORES.GUANXI, {
+    fromCharacterId,
+    toCharacterId,
+    typeId
+  });
+
+  return results.length > 0;
+}
+
+/**
+ * Update character relationship statistics
+ */
+async function updateCharacterStats(characterId) {
+  const relationships = await getGuanxiByCharacter(characterId);
+  
+  // Count active relationships (those with at least one active period or no periods)
+  const activeCount = relationships.filter(rel => {
+    if (!rel.periods || rel.periods.length === 0) {
+      return true; // No periods means always active
+    }
+    return rel.periods.some(p => !p.endTime);
+  }).length;
+
+  const characterService = require('./characterService.js');
+  const character = await characterService.getCharacterById(characterId);
+  
+  if (character) {
+    await characterService.updateCharacter(characterId, {
+      stats: {
+        guanxiCount: relationships.length,
+        activeGuanxiCount: activeCount
+      }
+    });
+  }
+}
+
 module.exports = {
-  getAllGuanxi,
   getGuanxiByCharacter,
   createGuanxi,
   updateGuanxi,
   deleteGuanxi,
   addPeriod,
+  endPeriod,
+  queryGuanxi,
+  getGuanxi,
+  findPath,
+  updateContactTime,
   relationshipExists
 };

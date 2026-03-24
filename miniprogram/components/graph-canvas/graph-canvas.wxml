@@ -1,0 +1,30 @@
+<!--components/graph-canvas/graph-canvas.wxml-->
+<view class="graph-canvas-container">
+  <canvas 
+    canvas-id="{{canvasId}}" 
+    class="graph-canvas"
+    style="width: {{width}}rpx; height: {{height}}rpx;"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+    disable-scroll="true"
+  ></canvas>
+
+  <!-- Legend (optional overlay) -->
+  <view class="graph-legend" wx:if="{{edges.length > 0}}">
+    <view class="legend-item">
+      <view class="legend-line solid"></view>
+      <text class="legend-text">{{t.graph.legend.explicitRelation || 'Explicit'}}</text>
+    </view>
+    <view class="legend-item">
+      <view class="legend-line dashed"></view>
+      <text class="legend-text">{{t.graph.legend.deducedRelation || 'Deduced'}}</text>
+    </view>
+  </view>
+
+  <!-- Empty state -->
+  <view class="graph-empty" wx:if="{{nodes.length === 0}}">
+    <text class="empty-icon">📊</text>
+    <text class="empty-text">{{t.graph.empty || 'No data to display'}}</text>
+  </view>
+</view>

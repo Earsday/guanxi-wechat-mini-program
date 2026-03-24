@@ -1,0 +1,153 @@
+<!--pages/graph/index/index.wxml-->
+<view class="graph-page">
+  <!-- Toolbar -->
+  <view class="graph-toolbar">
+    <view class="toolbar-left">
+      <view class="center-info" bindtap="toggleCenterPicker">
+        <text class="center-label">{{t.centerCharacter || 'Center'}}:</text>
+        <text class="center-name">{{centerCharacterName}}</text>
+        <text class="arrow-icon">▼</text>
+      </view>
+    </view>
+    
+    <view class="toolbar-right">
+      <view class="toolbar-button" bindtap="toggleLayoutPicker">
+        <text class="button-icon">📐</text>
+      </view>
+      <view class="toolbar-button" bindtap="toggleFilters">
+        <text class="button-icon">🔍</text>
+      </view>
+      <view class="toolbar-button" bindtap="onAnalyze">
+        <text class="button-icon">📊</text>
+      </view>
+      <view class="toolbar-button" bindtap="onExport">
+        <text class="button-icon">📤</text>
+      </view>
+      <view class="toolbar-button" bindtap="onRefresh">
+        <text class="button-icon">🔄</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Graph Stats -->
+  <view class="graph-stats" wx:if="{{graphStats}}">
+    <view class="stat-item">
+      <text class="stat-value">{{graphStats.totalNodes}}</text>
+      <text class="stat-label">{{t.characters || 'Characters'}}</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{graphStats.totalEdges}}</text>
+      <text class="stat-label">{{t.relationships || 'Relationships'}}</text>
+    </view>
+    <view class="stat-item">
+      <text class="stat-value">{{graphStats.maxDepth}}</text>
+      <text class="stat-label">{{t.levels || 'Levels'}}</text>
+    </view>
+  </view>
+
+  <!-- Graph Canvas -->
+  <view class="graph-canvas-wrapper">
+    <graph-canvas
+      id="graph-canvas"
+      nodes="{{nodes}}"
+      edges="{{edges}}"
+      positions="{{positions}}"
+      width="750"
+      height="1200"
+      enableZoom="{{true}}"
+      enablePan="{{true}}"
+      showLabels="{{true}}"
+      bind:nodetap="onNodeTap"
+    ></graph-canvas>
+  </view>
+
+  <!-- Loading Overlay -->
+  <view class="loading-overlay" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">{{t.loading || 'Loading...'}}</text>
+  </view>
+
+  <!-- Center Character Picker Modal -->
+  <view class="modal-overlay" wx:if="{{showCenterPicker}}" bindtap="toggleCenterPicker">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">{{t.selectCenter || 'Select Center Character'}}</text>
+        <view class="modal-close" bindtap="toggleCenterPicker">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="character-list">
+          <view 
+            class="character-item {{item.id === centerCharacterId ? 'selected' : ''}}"
+            wx:for="{{availableCharacters}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="onCenterSelect"
+          >
+            <text class="character-name">{{item.name}}</text>
+            <text class="character-check" wx:if="{{item.id === centerCharacterId}}">✓</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Layout Picker Modal -->
+  <view class="modal-overlay" wx:if="{{showLayoutPicker}}" bindtap="toggleLayoutPicker">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">{{t.selectLayout || 'Select Layout'}}</text>
+        <view class="modal-close" bindtap="toggleLayoutPicker">×</view>
+      </view>
+      <view class="modal-body">
+        <view class="layout-list">
+          <view 
+            class="layout-item {{item.id === currentLayout ? 'selected' : ''}}"
+            wx:for="{{layoutOptions}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="onLayoutChange"
+          >
+            <text class="layout-name">{{item.name}}</text>
+            <text class="layout-check" wx:if="{{item.id === currentLayout}}">✓</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Filters Panel -->
+  <view class="filters-panel {{showFilters ? 'show' : ''}}">
+    <view class="filters-header">
+      <text class="filters-title">{{t.filters || 'Filters'}}</text>
+      <view class="filters-close" bindtap="toggleFilters">×</view>
+    </view>
+    <view class="filters-body">
+      <view class="filter-group">
+        <text class="filter-label">{{t.maxDepth || 'Max Depth'}}</text>
+        <slider 
+          value="{{maxDepth}}" 
+          min="1" 
+          max="6" 
+          step="1" 
+          show-value
+          bindchange="onDepthChange"
+        />
+      </view>
+      
+      <view class="filter-group">
+        <view class="filter-checkbox">
+          <checkbox 
+            checked="{{excludeDeduced}}" 
+            bindtap="onToggleDeduced"
+          />
+          <text class="checkbox-label">{{t.excludeDeduced || 'Exclude Deduced Relations'}}</text>
+        </view>
+      </view>
+
+      <view class="filter-actions">
+        <button class="filter-button" bindtap="loadGraph">{{t.apply || 'Apply'}}</button>
+        <button class="filter-button secondary" bindtap="toggleFilters">{{t.cancel || 'Cancel'}}</button>
+      </view>
+    </view>
+  </view>
+</view>

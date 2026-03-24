@@ -1,0 +1,197 @@
+<!-- components/dynamic-form/dynamic-form.wxml -->
+<wxs module="formUtils">
+  // Check if field has error
+  function hasError(errors, fieldName) {
+    return errors && errors[fieldName];
+  }
+
+  // Get error message
+  function getError(errors, fieldName) {
+    return errors && errors[fieldName] ? errors[fieldName] : '';
+  }
+
+  // Check if value is in array (for checkbox)
+  function includes(arr, val) {
+    if (!arr || !Array.isArray(arr)) return false;
+    return arr.indexOf(val) !== -1;
+  }
+
+  module.exports = {
+    hasError: hasError,
+    getError: getError,
+    includes: includes
+  };
+</wxs>
+
+<view class="dynamic-form">
+  <!-- Loading State -->
+  <view class="form-loading" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">{{t.common.loading}}...</text>
+  </view>
+
+  <!-- Form Fields -->
+  <view class="form-fields" wx:else>
+    <block wx:for="{{fields}}" wx:key="name">
+      <view class="form-field {{formUtils.hasError(errors, item.name) ? 'has-error' : ''}}">
+        <!-- Field Label -->
+        <view class="field-label">
+          <text class="label-text">{{getFieldLabel(item)}}</text>
+          <text class="required-mark" wx:if="{{item.validation && item.validation.required}}">*</text>
+        </view>
+
+        <!-- String Input -->
+        <view class="field-input" wx:if="{{item.type === 'string'}}">
+          <input
+            class="input-control"
+            type="text"
+            placeholder="{{item.placeholder || ''}}"
+            value="{{formData[item.name]}}"
+            disabled="{{readonly}}"
+            maxlength="{{item.validation && item.validation.maxLength}}"
+            data-field="{{item.name}}"
+            bindinput="onInputChange"
+          />
+        </view>
+
+        <!-- Text Area -->
+        <view class="field-input" wx:elif="{{item.type === 'text'}}">
+          <textarea
+            class="textarea-control"
+            placeholder="{{item.placeholder || ''}}"
+            value="{{formData[item.name]}}"
+            disabled="{{readonly}}"
+            maxlength="{{item.validation && item.validation.maxLength}}"
+            auto-height
+            data-field="{{item.name}}"
+            bindinput="onInputChange"
+          />
+        </view>
+
+        <!-- Number Input -->
+        <view class="field-input" wx:elif="{{item.type === 'number'}}">
+          <input
+            class="input-control"
+            type="number"
+            placeholder="{{item.placeholder || ''}}"
+            value="{{formData[item.name]}}"
+            disabled="{{readonly}}"
+            data-field="{{item.name}}"
+            bindinput="onNumberChange"
+          />
+        </view>
+
+        <!-- Boolean Switch -->
+        <view class="field-input" wx:elif="{{item.type === 'boolean'}}">
+          <switch
+            checked="{{formData[item.name]}}"
+            disabled="{{readonly}}"
+            data-field="{{item.name}}"
+            bindchange="onSwitchChange"
+          />
+        </view>
+
+        <!-- Select (Single Choice) -->
+        <view class="field-input" wx:elif="{{item.type === 'select' && !readonly}}">
+          <picker
+            mode="selector"
+            range="{{item.options}}"
+            range-key="label"
+            value="{{getSelectedIndex(item)}}"
+            data-field="{{item.name}}"
+            bindchange="onPickerChange"
+          >
+            <view class="picker-display">
+              <text class="picker-text {{formData[item.name] ? '' : 'placeholder'}}">
+                {{formData[item.name] ? getSelectDisplayValue(item) : (item.placeholder || t.common.pleaseSelect)}}
+              </text>
+              <text class="picker-arrow">▼</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- Select (Readonly) -->
+        <view class="field-input" wx:elif="{{item.type === 'select' && readonly}}">
+          <text class="readonly-value">{{getSelectDisplayValue(item)}}</text>
+        </view>
+
+        <!-- Multi-Select (Checkbox Group) -->
+        <view class="field-input" wx:elif="{{item.type === 'multiSelect'}}">
+          <checkbox-group
+            data-field="{{item.name}}"
+            bindchange="onCheckboxChange"
+          >
+            <label class="checkbox-item" wx:for="{{item.options}}" wx:key="value" wx:for-item="option">
+              <checkbox
+                value="{{option.value}}"
+                checked="{{formUtils.includes(formData[item.name], option.value)}}"
+                disabled="{{readonly}}"
+              />
+              <text class="checkbox-label">{{getOptionLabel(item, option)}}</text>
+            </label>
+          </checkbox-group>
+        </view>
+
+        <!-- Date Picker -->
+        <view class="field-input" wx:elif="{{item.type === 'date' && !readonly}}">
+          <picker
+            mode="date"
+            value="{{formData[item.name]}}"
+            data-field="{{item.name}}"
+            bindchange="onDateChange"
+          >
+            <view class="picker-display">
+              <text class="picker-text {{formData[item.name] ? '' : 'placeholder'}}">
+                {{formData[item.name] || item.placeholder || t.common.pleaseSelect}}
+              </text>
+              <text class="picker-arrow">📅</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- Date (Readonly) -->
+        <view class="field-input" wx:elif="{{item.type === 'date' && readonly}}">
+          <text class="readonly-value">{{formData[item.name]}}</text>
+        </view>
+
+        <!-- DateTime Picker -->
+        <view class="field-input" wx:elif="{{item.type === 'datetime' && !readonly}}">
+          <picker
+            mode="time"
+            value="{{formData[item.name]}}"
+            data-field="{{item.name}}"
+            bindchange="onDateChange"
+          >
+            <view class="picker-display">
+              <text class="picker-text {{formData[item.name] ? '' : 'placeholder'}}">
+                {{formData[item.name] || item.placeholder || t.common.pleaseSelect}}
+              </text>
+              <text class="picker-arrow">🕒</text>
+            </view>
+          </picker>
+        </view>
+
+        <!-- DateTime (Readonly) -->
+        <view class="field-input" wx:elif="{{item.type === 'datetime' && readonly}}">
+          <text class="readonly-value">{{formData[item.name]}}</text>
+        </view>
+
+        <!-- Field Description -->
+        <view class="field-description" wx:if="{{item.description}}">
+          <text class="description-text">{{item.description}}</text>
+        </view>
+
+        <!-- Field Error -->
+        <view class="field-error" wx:if="{{formUtils.hasError(errors, item.name)}}">
+          <text class="error-text">{{formUtils.getError(errors, item.name)}}</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- Empty State -->
+    <view class="form-empty" wx:if="{{fields.length === 0 && !loading}}">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">{{t.common.noData || 'No fields to display'}}</text>
+    </view>
+  </view>
+</view>

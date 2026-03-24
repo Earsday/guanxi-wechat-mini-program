@@ -1,0 +1,80 @@
+/* components/graph-canvas/graph-canvas.wxss */
+.graph-canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #f8f9fa;
+  overflow: hidden;
+}
+
+.graph-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+/* Legend overlay */
+.graph-legend {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 12rpx;
+  padding: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.legend-item:last-child {
+  margin-bottom: 0;
+}
+
+.legend-line {
+  width: 40rpx;
+  height: 4rpx;
+  margin-right: 12rpx;
+}
+
+.legend-line.solid {
+  background-color: #999;
+}
+
+.legend-line.dashed {
+  background: linear-gradient(to right, #ccc 50%, transparent 50%);
+  background-size: 10rpx 4rpx;
+}
+
+.legend-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* Empty state */
+.graph-empty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+  opacity: 0.3;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}

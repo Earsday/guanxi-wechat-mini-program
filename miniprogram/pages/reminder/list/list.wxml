@@ -1,0 +1,96 @@
+<!--pages/reminder/list/list.wxml-->
+<view class="reminder-container">
+  <!-- Filter Bar -->
+  <view class="filter-bar">
+    <view class="filter-toggle" bindtap="toggleFilters">
+      <text>{{i18n.filterStatus}}</text>
+      <text class="icon">{{showFilters ? '▲' : '▼'}}</text>
+    </view>
+  </view>
+
+  <!-- Filters Panel -->
+  <view class="filters-panel" wx:if="{{showFilters}}">
+    <view class="filter-item">
+      <text class="filter-label">{{i18n.filterStatus}}</text>
+      <picker mode="selector" range="{{filterStatusOptions}}" range-key="label" bindchange="onFilterStatusChange">
+        <view class="picker">
+          <text>{{filterStatusOptions[filterStatus === 'all' ? 0 : filterStatus === 'pending' ? 1 : filterStatus === 'triggered' ? 2 : 3].label}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="filter-item">
+      <text class="filter-label">{{i18n.sortBy}}</text>
+      <picker mode="selector" range="{{sortByOptions}}" range-key="label" bindchange="onSortByChange">
+        <view class="picker">
+          <text>{{sortByOptions[sortBy === 'triggerTime' ? 0 : 1].label}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="filter-item">
+      <text class="filter-label">{{i18n.sortOrder}}</text>
+      <picker mode="selector" range="{{sortOrderOptions}}" range-key="label" bindchange="onSortOrderChange">
+        <view class="picker">
+          <text>{{sortOrderOptions[sortOrder === 'asc' ? 0 : 1].label}}</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- Reminder List -->
+  <view class="reminder-list" wx:if="{{!loading}}">
+    <view class="reminder-item {{item.status}}" wx:for="{{filteredReminders}}" wx:key="id" bindtap="onReminderTap" data-id="{{item.id}}">
+      <view class="reminder-icon">
+        <text>{{item.status === 'pending' ? '🔔' : item.status === 'triggered' ? '⏰' : '✓'}}</text>
+      </view>
+
+      <view class="reminder-content">
+        <view class="reminder-header">
+          <view class="reminder-title">{{item.title}}</view>
+          <view class="reminder-status {{item.status}}">{{item.statusLabel}}</view>
+        </view>
+
+        <view class="reminder-character">👤 {{item.characterName}}</view>
+        
+        <view class="reminder-time">
+          <text class="time-icon">⏰</text>
+          <text>{{item.formattedTriggerTime}}</text>
+        </view>
+
+        <view class="reminder-description" wx:if="{{item.message}}">
+          {{item.message}}
+        </view>
+      </view>
+
+      <view class="reminder-actions" catchtap="onActionTap">
+        <button wx:if="{{item.status === 'pending' || item.status === 'triggered'}}" class="action-btn dismiss" catchtap="onDismissReminder" data-id="{{item.id}}">
+          {{i18n.dismiss}}
+        </button>
+        <button class="action-btn edit" catchtap="onEditReminder" data-id="{{item.id}}">
+          {{i18n.edit}}
+        </button>
+        <button class="action-btn delete" catchtap="onDeleteReminder" data-id="{{item.id}}">
+          {{i18n.delete}}
+        </button>
+      </view>
+    </view>
+
+    <!-- Empty State -->
+    <view class="empty-state" wx:if="{{filteredReminders.length === 0}}">
+      <text class="empty-icon">🔔</text>
+      <text class="empty-text">{{i18n.noReminders}}</text>
+      <text class="empty-hint">{{i18n.noRemindersTip}}</text>
+    </view>
+  </view>
+
+  <!-- Loading -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>{{i18n.loading}}</text>
+  </view>
+
+  <!-- Create Button -->
+  <view class="create-btn" bindtap="onCreateReminder">
+    <text class="icon">+</text>
+  </view>
+</view>

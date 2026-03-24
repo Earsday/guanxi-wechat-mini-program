@@ -1,118 +1,239 @@
 <!--pages/guanxi/create/create.wxml-->
 <view class="container">
-  <view class="form">
-    <!-- From character -->
-    <view class="form-item">
-      <text class="form-label">从</text>
-      <picker
-        class="picker"
-        mode="selector"
-        range="{{characters}}"
-        range-key="name"
-        bindchange="onFromCharacterChange"
+  <!-- Progress indicator -->
+  <view class="progress-section">
+    <view class="progress-bar">
+      <view 
+        class="progress-fill" 
+        style="width: {{(currentStep / totalSteps) * 100}}%"
+      ></view>
+    </view>
+    <view class="step-indicators">
+      <view 
+        class="step-indicator {{currentStep >= index + 1 ? 'active' : ''}}"
+        wx:for="{{stepTitles}}" 
+        wx:key="index"
       >
-        <view class="picker-view">
-          <text wx:if="{{selectedFromId}}">已选择</text>
-          <text wx:else class="placeholder">选择人物</text>
+        <view class="step-number">{{index + 1}}</view>
+        <text class="step-title">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Step 1: Select characters -->
+  <view class="step-content" wx:if="{{currentStep === 1}}">
+    <view class="step-header">
+      <text class="step-icon">👥</text>
+      <text class="step-heading">{{t.pages.guanxiCreate.step1}}</text>
+      <text class="step-description">{{t.pages.guanxiCreate.step1Desc}}</text>
+    </view>
+
+    <!-- From character -->
+    <view class="character-section">
+      <view class="section-label">
+        <text class="label-icon">📍</text>
+        <text class="label-text">{{t.pages.guanxiCreate.fromLabel}}</text>
+        <text class="required">*</text>
+      </view>
+      
+      <view class="character-card" wx:if="{{fromCharacter}}" bindtap="onSelectFromCharacter">
+        <view class="character-info">
+          <view class="character-avatar">
+            <text class="avatar-text">{{fromCharacter.name.charAt(0)}}</text>
+          </view>
+          <view class="character-details">
+            <text class="character-name">{{fromCharacter.name}}</text>
+            <text class="character-alias" wx:if="{{fromCharacter.alias}}">{{fromCharacter.alias}}</text>
+          </view>
         </view>
-      </picker>
+        <view class="character-actions">
+          <view class="action-btn" catchtap="onClearFromCharacter">
+            <text class="action-icon">✕</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="select-placeholder" wx:else bindtap="onSelectFromCharacter">
+        <text class="placeholder-icon">➕</text>
+        <text class="placeholder-text">{{t.pages.guanxiCreate.selectCharacterPlaceholder}}</text>
+      </view>
+    </view>
+
+    <!-- Swap button -->
+    <view class="swap-section" wx:if="{{fromCharacter && toCharacter}}">
+      <view class="swap-button" bindtap="onSwapCharacters">
+        <text class="swap-icon">🔄</text>
+      </view>
+    </view>
+    <view class="arrow-down" wx:else>
+      <text class="arrow-icon">⬇️</text>
     </view>
 
     <!-- To character -->
-    <view class="form-item">
-      <text class="form-label">到</text>
-      <picker
-        class="picker"
-        mode="selector"
-        range="{{characters}}"
-        range-key="name"
-        bindchange="onToCharacterChange"
-      >
-        <view class="picker-view">
-          <text wx:if="{{selectedToId}}">已选择</text>
-          <text wx:else class="placeholder">选择人物</text>
-        </view>
-      </picker>
-    </view>
-
-    <!-- Relationship type -->
-    <view class="form-item">
-      <text class="form-label">关系类型</text>
-      <picker
-        class="picker"
-        mode="selector"
-        range="{{types}}"
-        range-key="name"
-        bindchange="onTypeChange"
-      >
-        <view class="picker-view">
-          <text wx:if="{{selectedTypeId}}">{{selectedType.name}}</text>
-          <text wx:else class="placeholder">选择关系类型</text>
-        </view>
-      </picker>
-    </view>
-
-    <!-- Dynamic form fields -->
-    <block wx:if="{{selectedType}}">
-      <view
-        class="form-item"
-        wx:for="{{selectedType.formFields}}"
-        wx:key="key"
-      >
-        <text class="form-label">
-          {{item.label}}
-          <text class="required" wx:if="{{item.required}}">*</text>
-        </text>
-
-        <!-- Text input -->
-        <input
-          wx:if="{{item.type === 'text'}}"
-          class="input"
-          type="text"
-          placeholder="{{item.placeholder}}"
-          value="{{formData[item.key]}}"
-          data-key="{{item.key}}"
-          bindinput="onFormInput"
-        />
-
-        <!-- Select picker -->
-        <picker
-          wx:if="{{item.type === 'select'}}"
-          class="picker"
-          mode="selector"
-          range="{{item.options}}"
-          range-key="label"
-          data-key="{{item.key}}"
-          bindchange="onFormInput"
-        >
-          <view class="picker-view">
-            <text wx:if="{{formData[item.key]}}">
-              {{formData[item.key]}}
-            </text>
-            <text wx:else class="placeholder">{{item.placeholder || '请选择'}}</text>
-          </view>
-        </picker>
-
-        <!-- Date picker -->
-        <picker
-          wx:if="{{item.type === 'date'}}"
-          class="picker"
-          mode="date"
-          value="{{formData[item.key]}}"
-          data-key="{{item.key}}"
-          bindchange="onFormInput"
-        >
-          <view class="picker-view">
-            <text wx:if="{{formData[item.key]}}">{{formData[item.key]}}</text>
-            <text wx:else class="placeholder">{{item.placeholder || '选择日期'}}</text>
-          </view>
-        </picker>
+    <view class="character-section">
+      <view class="section-label">
+        <text class="label-icon">🎯</text>
+        <text class="label-text">{{t.pages.guanxiCreate.toLabel}}</text>
+        <text class="required">*</text>
       </view>
-    </block>
+      
+      <view class="character-card" wx:if="{{toCharacter}}" bindtap="onSelectToCharacter">
+        <view class="character-info">
+          <view class="character-avatar">
+            <text class="avatar-text">{{toCharacter.name.charAt(0)}}</text>
+          </view>
+          <view class="character-details">
+            <text class="character-name">{{toCharacter.name}}</text>
+            <text class="character-alias" wx:if="{{toCharacter.alias}}">{{toCharacter.alias}}</text>
+          </view>
+        </view>
+        <view class="character-actions">
+          <view class="action-btn" catchtap="onClearToCharacter">
+            <text class="action-icon">✕</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="select-placeholder" wx:else bindtap="onSelectToCharacter">
+        <text class="placeholder-icon">➕</text>
+        <text class="placeholder-text">{{t.pages.guanxiCreate.selectCharacterPlaceholder}}</text>
+      </view>
+    </view>
+
+    <!-- Relationship preview -->
+    <view class="relationship-preview" wx:if="{{fromCharacter && toCharacter}}">
+      <view class="preview-box">
+        <text class="preview-text">
+          {{fromCharacter.name}} → {{toCharacter.name}}
+        </text>
+      </view>
+    </view>
   </view>
 
-  <!-- Submit button -->
-  <view class="submit-container">
-    <button class="btn-submit" bindtap="onSubmit">创建关系</button>
+  <!-- Step 2: Select type -->
+  <view class="step-content" wx:if="{{currentStep === 2}}">
+    <view class="step-header">
+      <text class="step-icon">🏷️</text>
+      <text class="step-heading">{{t.pages.guanxiCreate.step2}}</text>
+      <text class="step-description">{{t.pages.guanxiCreate.step2Desc}}</text>
+    </view>
+
+    <!-- Selected type preview -->
+    <view class="selected-type-preview" wx:if="{{selectedType}}">
+      <view class="type-preview-card">
+        <view class="type-info">
+          <text class="type-name">{{selectedType.name}}</text>
+          <text class="type-category">{{selectedType.category}}</text>
+        </view>
+        <text class="change-link" bindtap="onTypeSelect">{{t.common.change}}</text>
+      </view>
+    </view>
+
+    <!-- Type selector -->
+    <view class="type-selector-wrapper">
+      <type-selector
+        selectedTypeId="{{selectedTypeId}}"
+        showSearch="{{true}}"
+        showCategoryTabs="{{true}}"
+        bindchange="onTypeSelect"
+      />
+    </view>
+  </view>
+
+  <!-- Step 3: Fill form -->
+  <view class="step-content" wx:if="{{currentStep === 3}}">
+    <view class="step-header">
+      <text class="step-icon">📝</text>
+      <text class="step-heading">{{t.pages.guanxiCreate.step3}}</text>
+      <text class="step-description">{{t.pages.guanxiCreate.step3Desc}}</text>
+    </view>
+
+    <!-- Summary card -->
+    <view class="summary-card">
+      <view class="summary-row">
+        <text class="summary-label">{{t.pages.guanxiCreate.fromLabel}}:</text>
+        <text class="summary-value">{{fromCharacter.name}}</text>
+      </view>
+      <view class="summary-row">
+        <text class="summary-label">{{t.pages.guanxiCreate.toLabel}}:</text>
+        <text class="summary-value">{{toCharacter.name}}</text>
+      </view>
+      <view class="summary-row">
+        <text class="summary-label">{{t.pages.guanxiCreate.typeLabel}}:</text>
+        <text class="summary-value">{{selectedType.name}}</text>
+      </view>
+    </view>
+
+    <!-- Dynamic form -->
+    <view class="form-wrapper">
+      <dynamic-form
+        id="dynamicForm"
+        typeId="{{selectedTypeId}}"
+        value="{{formData}}"
+        bindchange="onFormChange"
+      />
+    </view>
+  </view>
+
+  <!-- Navigation buttons -->
+  <view class="navigation-section">
+    <view class="nav-buttons">
+      <!-- Cancel button -->
+      <button 
+        class="btn-secondary" 
+        bindtap="onCancel"
+        disabled="{{isSubmitting}}"
+      >
+        {{t.common.cancel}}
+      </button>
+
+      <!-- Back button (steps 2-3) -->
+      <button 
+        wx:if="{{currentStep > 1}}" 
+        class="btn-secondary"
+        bindtap="onPrevStep"
+        disabled="{{isSubmitting}}"
+      >
+        {{t.common.previous}}
+      </button>
+
+      <!-- Next button (steps 1-2) -->
+      <button 
+        wx:if="{{currentStep < totalSteps}}" 
+        class="btn-primary"
+        bindtap="onNextStep"
+        disabled="{{isSubmitting}}"
+      >
+        {{t.common.next}}
+      </button>
+
+      <!-- Submit button (step 3) -->
+      <button 
+        wx:if="{{currentStep === totalSteps}}" 
+        class="btn-submit"
+        bindtap="onSubmit"
+        disabled="{{isSubmitting}}"
+        loading="{{isSubmitting}}"
+      >
+        {{t.pages.guanxiCreate.submitButton}}
+      </button>
+    </view>
   </view>
 </view>
+
+<!-- Character pickers -->
+<character-picker
+  visible="{{showFromPicker}}"
+  mode="single"
+  excludeIds="{{toCharacter ? [toCharacter.id] : []}}"
+  bindconfirm="onFromCharacterSelect"
+  bindcancel="onFromPickerClose"
+/>
+
+<character-picker
+  visible="{{showToPicker}}"
+  mode="single"
+  excludeIds="{{fromCharacter ? [fromCharacter.id] : []}}"
+  bindconfirm="onToCharacterSelect"
+  bindcancel="onToPickerClose"
+/>

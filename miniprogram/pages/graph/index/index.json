@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "Relationship Graph",
+  "usingComponents": {
+    "graph-canvas": "/components/graph-canvas/graph-canvas"
+  }
+}

@@ -1,0 +1,82 @@
+<!--pages/timeline/index/index.wxml-->
+<view class="timeline-container">
+  <!-- Filter Bar -->
+  <view class="filter-bar">
+    <view class="filter-toggle" bindtap="toggleFilters">
+      <text>{{i18n.filterType}}</text>
+      <text class="icon">{{showFilters ? '▲' : '▼'}}</text>
+    </view>
+  </view>
+
+  <!-- Filters Panel -->
+  <view class="filters-panel" wx:if="{{showFilters}}">
+    <view class="filter-item">
+      <text class="filter-label">{{i18n.filterType}}</text>
+      <picker mode="selector" range="{{filterTypeOptions}}" range-key="label" value="{{filterType}}" bindchange="onFilterTypeChange">
+        <view class="picker">
+          <text>{{filterTypeOptions[filterType === 'all' ? 0 : filterType === 'birthday' ? 1 : 2].label}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="filter-item">
+      <text class="filter-label">{{i18n.sortOrder}}</text>
+      <picker mode="selector" range="{{sortOrderOptions}}" range-key="label" value="{{sortOrder}}" bindchange="onSortOrderChange">
+        <view class="picker">
+          <text>{{sortOrderOptions[sortOrder === 'desc' ? 0 : 1].label}}</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- Timeline List -->
+  <view class="timeline-list" wx:if="{{!loading}}">
+    <view class="timeline-item" wx:for="{{filteredEvents}}" wx:key="id" bindtap="onEventTap" data-id="{{item.id}}">
+      <view class="timeline-dot"></view>
+      <view class="timeline-line" wx:if="{{index < filteredEvents.length - 1}}"></view>
+      
+      <view class="event-card">
+        <view class="event-header">
+          <view class="event-time">{{item.formattedTime}}</view>
+          <view class="event-type {{item.type}}">
+            {{item.type === 'birthday' ? '🎂' : '📅'}}
+          </view>
+        </view>
+        
+        <view class="event-content">
+          <view class="event-title">{{item.title || item.characterName}}</view>
+          <view class="event-character">{{item.characterName}}</view>
+          <view class="event-description" wx:if="{{item.description}}">
+            {{item.description}}
+          </view>
+        </view>
+
+        <view class="event-actions" catchtap="onActionTap">
+          <button class="action-btn edit" catchtap="onEditEvent" data-id="{{item.id}}">
+            {{i18n.edit}}
+          </button>
+          <button class="action-btn delete" catchtap="onDeleteEvent" data-id="{{item.id}}">
+            {{i18n.delete}}
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <!-- Empty State -->
+    <view class="empty-state" wx:if="{{filteredEvents.length === 0}}">
+      <text class="empty-icon">📅</text>
+      <text class="empty-text">{{i18n.noEvents}}</text>
+      <text class="empty-hint">{{i18n.noEventsTip}}</text>
+    </view>
+  </view>
+
+  <!-- Loading -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>{{i18n.loading}}</text>
+  </view>
+
+  <!-- Create Button -->
+  <view class="create-btn" bindtap="onCreateEvent">
+    <text class="icon">+</text>
+  </view>
+</view>

@@ -1,0 +1,78 @@
+<!--components/character-picker/character-picker.wxml-->
+<view class="character-picker" wx:if="{{visible}}">
+  <!-- 遮罩层 -->
+  <view class="picker-mask" bindtap="onMaskTap"></view>
+  
+  <!-- 选择器容器 -->
+  <view class="picker-container">
+    <!-- 头部 -->
+    <view class="picker-header">
+      <text class="header-title">{{t.character.searchCharacter}}</text>
+      <view class="header-close" bindtap="onCancel">
+        <text>{{t.common.close}}</text>
+      </view>
+    </view>
+    
+    <!-- 搜索框 -->
+    <view class="picker-search">
+      <input 
+        class="search-input"
+        type="text"
+        placeholder="{{t.pages.characterList.searchPlaceholder}}"
+        value="{{searchKeyword}}"
+        bindinput="onSearch"
+      />
+    </view>
+    
+    <!-- 加载状态 -->
+    <view class="picker-loading" wx:if="{{loading}}">
+      <text>{{t.common.loading}}</text>
+    </view>
+    
+    <!-- 人物列表 -->
+    <scroll-view 
+      class="picker-list" 
+      scroll-y
+      wx:elif="{{filteredCharacters.length > 0}}"
+    >
+      <view 
+        class="character-item {{isSelected(item.id) ? 'selected' : ''}}"
+        wx:for="{{filteredCharacters}}"
+        wx:key="id"
+        data-id="{{item.id}}"
+        bindtap="onCharacterTap"
+      >
+        <!-- 人物头像 -->
+        <view class="character-avatar">
+          <text class="avatar-text">{{formatCharacterName(item).substr(0, 1)}}</text>
+        </view>
+        
+        <!-- 人物信息 -->
+        <view class="character-info">
+          <text class="character-name">{{formatCharacterName(item)}}</text>
+          <text class="character-age" wx:if="{{formatCharacterAge(item)}}">
+            {{formatCharacterAge(item)}}
+          </text>
+        </view>
+        
+        <!-- 选中标记 -->
+        <view class="character-check" wx:if="{{isSelected(item.id)}}">
+          <text class="check-icon">✓</text>
+        </view>
+      </view>
+    </scroll-view>
+    
+    <!-- 空状态 -->
+    <view class="picker-empty" wx:else>
+      <text class="empty-text">{{t.character.noCharacters}}</text>
+    </view>
+    
+    <!-- 底部按钮（仅多选模式） -->
+    <view class="picker-footer" wx:if="{{mode === 'multiple'}}">
+      <button class="btn-cancel" bindtap="onCancel">{{t.common.cancel}}</button>
+      <button class="btn-confirm" bindtap="onConfirm">
+        {{t.common.confirm}} ({{selectedIds.length}})
+      </button>
+    </view>
+  </view>
+</view>

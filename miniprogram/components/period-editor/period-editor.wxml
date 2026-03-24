@@ -1,0 +1,133 @@
+<!--components/period-editor/period-editor.wxml-->
+<view class="period-editor">
+  <!-- Periods List -->
+  <view class="periods-list">
+    <block wx:for="{{periodsList}}" wx:key="index">
+      <view class="period-item {{readonly ? 'readonly' : ''}}">
+        <!-- Period Header -->
+        <view class="period-header">
+          <view class="period-number">
+            <text class="number-badge">{{index + 1}}</text>
+          </view>
+          <view class="period-status">
+            <view class="status-badge {{item.status}}">
+              <text class="status-text">{{t.status[item.status]}}</text>
+            </view>
+          </view>
+          <view class="period-actions" wx:if="{{!readonly && periodsList.length > 1}}">
+            <view class="action-btn delete-btn" bindtap="deletePeriod" data-index="{{index}}">
+              <text class="icon">✕</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- Start Date -->
+        <view class="form-field">
+          <view class="field-label">
+            <text class="label-text">{{t.startTime}}</text>
+            <text class="required-mark">*</text>
+          </view>
+          <view class="field-control">
+            <picker 
+              wx:if="{{!readonly}}"
+              mode="date" 
+              value="{{item.startTime}}" 
+              bindchange="onStartDateChange"
+              data-index="{{index}}"
+              class="date-picker">
+              <view class="picker-display">
+                <text class="date-text">{{item.startTime || t.startTime}}</text>
+                <text class="picker-arrow">›</text>
+              </view>
+            </picker>
+            <view wx:else class="readonly-value">
+              <text>{{item.startTime}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- End Date -->
+        <view class="form-field">
+          <view class="field-label">
+            <text class="label-text">{{t.endTime}}</text>
+          </view>
+          <view class="field-control">
+            <picker 
+              wx:if="{{!readonly && !item.isOngoing}}"
+              mode="date" 
+              value="{{item.endTime}}" 
+              bindchange="onEndDateChange"
+              data-index="{{index}}"
+              class="date-picker">
+              <view class="picker-display">
+                <text class="date-text">{{item.endTime || t.endTime}}</text>
+                <text class="picker-arrow">›</text>
+              </view>
+            </picker>
+            <view wx:elif="{{item.isOngoing}}" class="ongoing-badge">
+              <text>{{t.ongoing}}</text>
+            </view>
+            <view wx:else class="readonly-value">
+              <text>{{item.endTime || t.ongoing}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- Ongoing Checkbox -->
+        <view class="form-field checkbox-field" wx:if="{{!readonly}}">
+          <label class="checkbox-label">
+            <checkbox 
+              checked="{{item.isOngoing}}" 
+              bindchange="onOngoingChange"
+              data-index="{{index}}"
+              class="checkbox-input"
+            />
+            <text class="checkbox-text">{{t.ongoing}}</text>
+          </label>
+        </view>
+
+        <!-- Note -->
+        <view class="form-field">
+          <view class="field-label">
+            <text class="label-text">{{t.note}}</text>
+          </view>
+          <view class="field-control">
+            <textarea 
+              wx:if="{{!readonly}}"
+              value="{{item.note}}"
+              placeholder="{{t.notePlaceholder}}"
+              bindinput="onNoteInput"
+              data-index="{{index}}"
+              class="note-textarea"
+              maxlength="200"
+              auto-height
+            />
+            <view wx:else class="readonly-value">
+              <text>{{item.note || '-'}}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- Period Duration Display -->
+        <view class="period-duration" wx:if="{{item.startTime}}">
+          <text class="duration-text">
+            {{item.startTime}} ~ {{item.isOngoing ? t.ongoing : (item.endTime || '-')}}
+          </text>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- Add Period Button -->
+  <view class="add-period-section" wx:if="{{!readonly && (mode === 'multiple' || periodsList.length === 0)}}">
+    <view class="add-period-btn" bindtap="addPeriod">
+      <text class="add-icon">+</text>
+      <text class="add-text">{{t.addPeriod}}</text>
+    </view>
+  </view>
+
+  <!-- Empty State -->
+  <view class="empty-state" wx:if="{{periodsList.length === 0 && readonly}}">
+    <text class="empty-text">No periods recorded</text>
+  </view>
+</view>

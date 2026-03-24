@@ -1,45 +1,196 @@
 <!--pages/characters/list/list.wxml-->
 <view class="container">
-  <!-- Search bar -->
-  <view class="search-bar">
-    <input
-      class="search-input"
-      type="text"
-      placeholder="搜索人物姓名或备注"
-      value="{{searchKeyword}}"
-      bindinput="onSearchInput"
-    />
-  </view>
+  <!-- Header with search and controls -->
+  <view class="header">
+    <!-- Search bar -->
+    <view class="search-bar">
+      <view class="search-icon">🔍</view>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="{{t.pages.characterList.searchPlaceholder}}"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+      <view class="clear-icon" wx:if="{{searchKeyword}}" bindtap="onClearSearch">×</view>
+    </view>
 
-  <!-- Character list -->
-  <view class="character-list" wx:if="{{characters.length > 0}}">
-    <view
-      class="card character-item"
-      wx:for="{{characters}}"
-      wx:key="id"
-      data-id="{{item.id}}"
-      bindtap="goToDetail"
-    >
-      <view class="character-info">
-        <text class="character-name">{{item.name}}</text>
-        <text class="character-meta" wx:if="{{item.age}}">{{item.age}}岁</text>
-        <text class="character-meta" wx:if="{{item.gender}}">
-          {{item.gender === 'male' ? '男' : '女'}}
+    <!-- Control buttons -->
+    <view class="controls">
+      <view class="control-button {{showSortMenu ? 'active' : ''}}" bindtap="toggleSortMenu">
+        <text class="control-icon">⇅</text>
+        <text class="control-label">{{t.pages.characterList.sort.title || '排序'}}</text>
+      </view>
+      <view class="control-button {{showFilterMenu ? 'active' : ''}}" bindtap="toggleFilterMenu">
+        <text class="control-icon">⚲</text>
+        <text class="control-label">{{t.pages.characterList.filter.title || '筛选'}}</text>
+      </view>
+    </view>
+
+    <!-- Sort menu -->
+    <view class="dropdown-menu sort-menu" wx:if="{{showSortMenu}}">
+      <view 
+        class="menu-item {{sortBy === item.value ? 'active' : ''}}"
+        wx:for="{{sortOptions}}"
+        wx:key="value"
+        data-value="{{item.value}}"
+        bindtap="onSortChange"
+      >
+        <text>{{item.label}}</text>
+        <text class="sort-icon" wx:if="{{sortBy === item.value}}">
+          {{sortOrder === 'asc' ? '↑' : '↓'}}
         </text>
       </view>
-      <view class="character-arrow">›</view>
+    </view>
+
+    <!-- Filter menu -->
+    <view class="dropdown-menu filter-menu" wx:if="{{showFilterMenu}}">
+      <view class="filter-section">
+        <text class="filter-label">{{t.pages.characterList.filter.gender || '性别'}}</text>
+        <view class="filter-options">
+          <view 
+            class="filter-chip {{selectedGender === 'all' ? 'active' : ''}}"
+            data-value="all"
+            bindtap="onGenderFilterChange"
+          >
+            {{t.pages.characterList.filter.all || '全部'}}
+          </view>
+          <view 
+            class="filter-chip {{selectedGender === 'male' ? 'active' : ''}}"
+            data-value="male"
+            bindtap="onGenderFilterChange"
+          >
+            {{t.character.gender.male || '男'}}
+          </view>
+          <view 
+            class="filter-chip {{selectedGender === 'female' ? 'active' : ''}}"
+            data-value="female"
+            bindtap="onGenderFilterChange"
+          >
+            {{t.character.gender.female || '女'}}
+          </view>
+        </view>
+      </view>
+
+      <view class="filter-section" wx:if="{{groups.length > 0}}">
+        <text class="filter-label">{{t.pages.characterList.filter.group || '分组'}}</text>
+        <picker 
+          mode="selector" 
+          range="{{groups}}"
+          range-key="label"
+          value="{{selectedGroup}}"
+          bindchange="onGroupFilterChange"
+        >
+          <view class="picker-display">
+            {{selectedGroup === 'all' ? (t.pages.characterList.filter.all || '全部') : selectedGroup}}
+          </view>
+        </picker>
+      </view>
+
+      <view class="filter-actions">
+        <view class="filter-reset" bindtap="onResetFilter">
+          {{t.common.reset || '重置'}}
+        </view>
+      </view>
     </view>
   </view>
 
-  <!-- Empty state -->
-  <view class="empty-state" wx:if="{{characters.length === 0}}">
-    <text class="empty-icon">👤</text>
-    <text class="empty-text">暂无人物</text>
-    <text class="empty-hint">点击下方按钮添加人物</text>
-  </view>
+  <!-- Loading state with skeleton -->
+  <skeleton
+    wx:if="{{loading}}"
+    type="list"
+    rows="8"
+    avatar="{{true}}"
+    animated="{{true}}"
+  />
 
-  <!-- Add button -->
-  <view class="fab" bindtap="goToCreate">
+  <!-- Character list with alphabet sections -->
+  <scroll-view 
+    class="character-list" 
+    scroll-y="{{true}}"
+    scroll-into-view="{{scrollToLetter ? 'letter-' + scrollToLetter : ''}}"
+    wx:if="{{!loading && characters.length > 0}}"
+  >
+    <block wx:for="{{alphabetIndexList}}" wx:key="*this" wx:for-item="letter">
+      <view class="letter-section" id="letter-{{letter}}">
+        <!-- Letter header -->
+        <view class="letter-header">
+          <text class="letter-text">{{letter}}</text>
+          <view class="letter-line"></view>
+        </view>
+
+        <!-- Characters in this letter group -->
+        <view class="character-cards">
+          <view
+            class="card character-card"
+            wx:for="{{groupedCharacters[letter]}}"
+            wx:key="id"
+            wx:for-item="character"
+          >
+            <view class="character-main" data-id="{{character.id}}" bindtap="goToDetail">
+              <!-- Avatar or initial -->
+              <view class="character-avatar">
+                <text class="avatar-text">{{character.name ? character.name.charAt(0) : '?'}}</text>
+              </view>
+
+              <!-- Character info -->
+              <view class="character-info">
+                <view class="character-name-row">
+                  <text class="character-name">{{character.name}}</text>
+                  <text class="character-alias" wx:if="{{character.alias}}">（{{character.alias}}）</text>
+                </view>
+                
+                <view class="character-meta-row">
+                  <text class="character-meta" wx:if="{{character.gender}}">
+                    {{character.gender === 'male' ? '👨' : '👩'}}
+                    {{character.gender === 'male' ? t.character.gender.male : t.character.gender.female}}
+                  </text>
+                  <text class="character-meta" wx:if="{{character.age}}">
+                    🎂 {{character.age}}{{t.pages.characterList.ageUnit || '岁'}}
+                  </text>
+                  <text class="character-meta" wx:if="{{character.group}}">
+                    📁 {{character.group}}
+                  </text>
+                </view>
+              </view>
+            </view>
+
+            <!-- Actions -->
+            <view class="character-actions">
+              <view class="action-button edit-button" data-id="{{character.id}}" bindtap="goToEdit" catchtap="goToEdit">
+                <text class="action-icon">✏️</text>
+              </view>
+              <view class="action-button detail-button" data-id="{{character.id}}" bindtap="goToDetail">
+                <text class="action-icon">›</text>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+
+  <!-- Alphabet index -->
+  <alphabet-index
+    wx:if="{{!loading && characters.length > 0 && showAlphabetIndex}}"
+    indexList="{{alphabetIndexList}}"
+    type="custom"
+    activeColor="#4A90E2"
+    hapticFeedback="{{true}}"
+    showIndicator="{{true}}"
+    bind:select="onAlphabetSelect"
+  />
+
+  <!-- Empty state -->
+  <empty-state
+    wx:if="{{!loading && characters.length === 0}}"
+    type="character"
+    showAction="{{true}}"
+    bind:action="goToCreate"
+  />
+
+  <!-- Floating action button -->
+  <view class="fab" bindtap="goToCreate" wx:if="{{!loading}}">
     <text class="fab-icon">+</text>
   </view>
 </view>

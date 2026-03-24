@@ -1,0 +1,152 @@
+<!--pages/guanxi/list/list.wxml-->
+<view class="guanxi-list-page">
+  <!-- Header -->
+  <view class="page-header">
+    <text class="page-title">{{t.guanxi.title || '关系'}}</text>
+    <view class="header-actions">
+      <view class="filter-btn" bindtap="toggleFilter">
+        <text class="icon">⚙️</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Filter Panel -->
+  <view class="filter-panel" wx:if="{{showFilter}}">
+    <view class="filter-group">
+      <text class="filter-label">{{t.guanxiList.filterByType || '类型筛选'}}:</text>
+      <picker
+        mode="selector"
+        range="{{['all', 'family_relative', 'social_friend', 'work_colleague', 'education_classmate', 'location_neighbor']}}"
+        range-key="label"
+        value="{{filterType}}"
+        bindchange="onFilterTypeChange"
+      >
+        <view class="picker-value">
+          <text wx:if="{{filterType === 'all'}}">{{t.guanxiList.allTypes || '全部类型'}}</text>
+          <text wx:elif="{{filterType === 'family_relative'}}">{{t.guanxiType.family_relative.name || '亲属关系'}}</text>
+          <text wx:elif="{{filterType === 'social_friend'}}">{{t.guanxiType.social_friend.name || '好友关系'}}</text>
+          <text wx:elif="{{filterType === 'work_colleague'}}">{{t.guanxiType.work_colleague.name || '同事关系'}}</text>
+          <text wx:elif="{{filterType === 'education_classmate'}}">{{t.guanxiType.education_classmate.name || '同学关系'}}</text>
+          <text wx:elif="{{filterType === 'location_neighbor'}}">{{t.guanxiType.location_neighbor.name || '邻里关系'}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="filter-group">
+      <text class="filter-label">{{t.guanxiList.sortBy || '排序'}}:</text>
+      <picker
+        mode="selector"
+        range="{{['createdAt', 'updatedAt']}}"
+        range-key="label"
+        value="{{sortBy}}"
+        bindchange="onSortByChange"
+      >
+        <view class="picker-value">
+          <text wx:if="{{sortBy === 'createdAt'}}">{{t.guanxiList.createdAt || '创建时间'}}</text>
+          <text wx:elif="{{sortBy === 'updatedAt'}}">{{t.guanxiList.updatedAt || '更新时间'}}</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="filter-group">
+      <text class="filter-label">{{t.guanxiList.order || '顺序'}}:</text>
+      <picker
+        mode="selector"
+        range="{{['desc', 'asc']}}"
+        range-key="label"
+        value="{{sortOrder}}"
+        bindchange="onSortOrderChange"
+      >
+        <view class="picker-value">
+          <text wx:if="{{sortOrder === 'desc'}}">{{t.guanxiList.descending || '降序'}}</text>
+          <text wx:elif="{{sortOrder === 'asc'}}">{{t.guanxiList.ascending || '升序'}}</text>
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- Stats -->
+  <view class="stats-bar" wx:if="{{!isLoading}}">
+    <text class="stats-text">
+      {{t.guanxiList.totalCount || '共'}} {{filteredList.length}} {{t.guanxiList.relationships || '个关系'}}
+    </text>
+  </view>
+
+  <!-- Loading skeleton -->
+  <skeleton
+    wx:if="{{isLoading}}"
+    type="list"
+    rows="6"
+    avatar="{{true}}"
+    animated="{{true}}"
+  />
+
+  <!-- Guanxi List -->
+  <view class="guanxi-list" wx:if="{{!isLoading && filteredList.length > 0}}">
+    <view
+      wx:for="{{filteredList}}"
+      wx:key="_id"
+      class="guanxi-item"
+      bindtap="goToDetail"
+      data-id="{{item._id}}"
+    >
+      <view class="guanxi-content">
+        <!-- From Character -->
+        <view class="character-info" catchtap="goToCharacterDetail" data-id="{{item.fromCharacterId}}">
+          <view class="character-avatar">
+            <image wx:if="{{item.fromCharacter && item.fromCharacter.avatar}}" 
+                   src="{{item.fromCharacter.avatar}}" mode="aspectFill" />
+            <text wx:else class="avatar-placeholder">
+              {{item.formattedFromName ? item.formattedFromName[0] : '?'}}
+            </text>
+          </view>
+          <text class="character-name">{{item.formattedFromName}}</text>
+        </view>
+
+        <!-- Relationship Icon -->
+        <view class="relationship-icon">
+          <text class="icon-arrow">→</text>
+          <view class="relationship-type">
+            <text class="type-text">{{item.typeInfo ? item.typeInfo.name : item.typeId}}</text>
+          </view>
+        </view>
+
+        <!-- To Character -->
+        <view class="character-info" catchtap="goToCharacterDetail" data-id="{{item.toCharacterId}}">
+          <view class="character-avatar">
+            <image wx:if="{{item.toCharacter && item.toCharacter.avatar}}" 
+                   src="{{item.toCharacter.avatar}}" mode="aspectFill" />
+            <text wx:else class="avatar-placeholder">
+              {{item.formattedToName ? item.formattedToName[0] : '?'}}
+            </text>
+          </view>
+          <text class="character-name">{{item.formattedToName}}</text>
+        </view>
+      </view>
+
+      <!-- Meta Info -->
+      <view class="guanxi-meta">
+        <text class="meta-item">{{item.formattedCreatedAt}}</text>
+        <text wx:if="{{item.isDeduced}}" class="meta-badge deduced">
+          {{t.guanxiList.deduced || '推导'}}
+        </text>
+        <text wx:elif="{{item.periods && item.periods.length > 0}}" class="meta-badge active">
+          {{t.guanxiList.active || '活跃'}}
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Empty State -->
+  <empty-state
+    wx:elif="{{!isLoading && filteredList.length === 0}}"
+    type="guanxi"
+    showAction="{{true}}"
+    bind:action="goToCreate"
+  />
+
+  <!-- Create Button -->
+  <view class="create-btn" bindtap="goToCreate">
+    <text class="btn-icon">+</text>
+  </view>
+</view>

@@ -1,0 +1,31 @@
+<!--components/alphabet-index/alphabet-index.wxml-->
+<view class="alphabet-index-container">
+  <!-- Index bar -->
+  <view 
+    class="alphabet-index-bar"
+    bindtouchstart="onTouchStart"
+    bindtouchmove="onTouchMove"
+    bindtouchend="onTouchEnd"
+    catchtouchmove="true"
+  >
+    <view 
+      wx:for="{{displayIndexList}}" 
+      wx:key="*this"
+      class="index-item {{activeIndex === item ? 'active' : ''}}"
+      data-letter="{{item}}"
+      bindtap="onIndexTap"
+      style="color: {{activeIndex === item ? activeColor : ''}}"
+    >
+      {{item}}
+    </view>
+  </view>
+
+  <!-- Indicator popup -->
+  <view 
+    wx:if="{{showIndicator && showIndicatorPopup}}" 
+    class="index-indicator"
+    style="background-color: {{activeColor}}"
+  >
+    <text class="indicator-text">{{activeIndex}}</text>
+  </view>
+</view>

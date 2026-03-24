@@ -1,5 +1,7 @@
 // pages/index/index.js
 const typeService = require('../../services/typeService.js');
+const i18n = require('../../utils/i18n.js');
+const formatters = require('../../utils/formatters.js');
 
 Page({
   data: {
@@ -8,22 +10,43 @@ Page({
       characterCount: 0,
       guanxiCount: 0,
       typeCount: 0
-    }
+    },
+    t: {},
+    currentLocale: '',
+    loading: false
   },
 
   onLoad: function () {
     console.log('Index page loaded');
+    this.setI18nMessages();
     this.loadData();
   },
 
   onShow: function () {
-    // Refresh data when page is shown
+    // Refresh data and check for locale changes
+    this.setI18nMessages();
     this.loadData();
+  },
+
+  onPullDownRefresh: function () {
+    this.loadData().then(() => {
+      wx.stopPullDownRefresh();
+    });
+  },
+
+  setI18nMessages() {
+    const locale = i18n.getLocale();
+    if (this.data.currentLocale !== locale) {
+      this.setData({
+        t: i18n.getMessages(),
+        currentLocale: locale
+      });
+    }
   },
 
   async loadData() {
     try {
-      wx.showLoading({ title: '加载中...' });
+      this.setData({ loading: true });
 
       // Load relationship types
       const types = await typeService.getAllTypes();
@@ -33,21 +56,36 @@ Page({
       const characters = await storage.getAll(storage.STORAGE_KEYS.CHARACTERS);
       const guanxi = await storage.getAll(storage.STORAGE_KEYS.GUANXI);
 
+      // Format types with localized names and add icons
+      const categoryIcons = {
+        family_relative: '👨‍👩‍👧‍👦',
+        social_friend: '👥',
+        work_colleague: '💼',
+        education_classmate: '🎓',
+        location_neighbor: '🏘️'
+      };
+
+      const formattedTypes = types.slice(0, 5).map(type => ({
+        ...type,
+        displayName: i18n.t(`guanxiType.${type.id}.name`) || type.name,
+        icon: categoryIcons[type.category] || '📌',
+        category: i18n.t(`guanxi.categories.${type.category}`) || type.category
+      }));
+
       this.setData({
-        types: types.slice(0, 5), // Show top 5 types
+        types: formattedTypes,
         stats: {
           characterCount: characters.length,
           guanxiCount: guanxi.length,
           typeCount: types.length
-        }
+        },
+        loading: false
       });
-
-      wx.hideLoading();
     } catch (err) {
       console.error('Failed to load data:', err);
-      wx.hideLoading();
+      this.setData({ loading: false });
       wx.showToast({
-        title: '加载失败',
+        title: this.data.t.messages?.loadFailed || '加载失败',
         icon: 'none'
       });
     }
@@ -60,10 +98,46 @@ Page({
     });
   },
 
+  // Navigate to character edit (add new character)
+  goToCharacterEdit: function () {
+    wx.navigateTo({
+      url: '/pages/characters/edit/edit'
+    });
+  },
+
   // Navigate to create relationship
   goToCreateGuanxi: function () {
     wx.navigateTo({
       url: '/pages/guanxi/create/create'
+    });
+  },
+
+  // Navigate to guanxi list
+  goToGuanxiList: function () {
+    wx.navigateTo({
+      url: '/pages/guanxi/list/list'
+    });
+  },
+
+  // Navigate to graph
+  goToGraph: function () {
+    wx.switchTab({
+      url: '/pages/graph/index/index'
+    });
+  },
+
+  // Navigate to search
+  goToSearch: function () {
+    wx.navigateTo({
+      url: '/pages/characters/search/search'
+    });
+  },
+
+  // Navigate to type list (placeholder)
+  goToTypeList: function () {
+    wx.showToast({
+      title: this.data.t.messages?.comingSoon || '功能开发中',
+      icon: 'none'
     });
   }
 });

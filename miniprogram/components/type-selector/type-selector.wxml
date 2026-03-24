@@ -1,0 +1,122 @@
+<!-- components/type-selector/type-selector.wxml -->
+<view class="type-selector">
+  <!-- Search Box -->
+  <view class="search-box" wx:if="{{showSearch}}">
+    <view class="search-input-wrapper">
+      <icon class="search-icon" type="search" size="16"></icon>
+      <input 
+        class="search-input"
+        type="text"
+        placeholder="{{t.searchPlaceholder}}"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+      />
+      <view 
+        class="clear-btn" 
+        wx:if="{{searchKeyword}}"
+        bindtap="onClearSearch"
+      >
+        <icon type="clear" size="14"></icon>
+      </view>
+    </view>
+  </view>
+
+  <!-- Category Tabs -->
+  <view class="category-tabs" wx:if="{{showCategoryTabs && categories.length > 0}}">
+    <scroll-view class="tabs-scroll" scroll-x>
+      <view class="tabs-container">
+        <view 
+          class="tab-item {{activeCategory === 'all' ? 'active' : ''}}"
+          data-category="all"
+          bindtap="onCategoryChange"
+        >
+          {{t.all}}
+        </view>
+        <view 
+          class="tab-item {{activeCategory === item.id ? 'active' : ''}}"
+          wx:for="{{categories}}"
+          wx:key="id"
+          data-category="{{item.id}}"
+          bindtap="onCategoryChange"
+        >
+          {{item.name}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- Loading State -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">{{t.loading}}</text>
+  </view>
+
+  <!-- Type List -->
+  <view class="types-container" wx:if="{{!loading}}">
+    <!-- List Mode -->
+    <scroll-view 
+      class="types-list" 
+      scroll-y
+      wx:if="{{mode === 'list'}}"
+    >
+      <view 
+        class="type-item {{selectedTypeId === item._id ? 'selected' : ''}} {{readonly ? 'readonly' : ''}}"
+        wx:for="{{filteredTypes}}"
+        wx:key="_id"
+        data-id="{{item._id}}"
+        bindtap="onTypeSelect"
+      >
+        <view class="type-main">
+          <view class="type-icon" style="background-color: {{item.color}}20; color: {{item.color}}">
+            <text class="icon-text">{{item.icon || '🔗'}}</text>
+          </view>
+          <view class="type-info">
+            <view class="type-name">
+              {{item.nameI18nKey ? t[item._id + '.name'] : (currentLocale === 'en-US' && item.nameEn ? item.nameEn : item.name)}}
+            </view>
+            <view class="type-description">
+              {{item.descriptionI18nKey ? t[item._id + '.description'] : (currentLocale === 'en-US' && item.descriptionEn ? item.descriptionEn : item.description)}}
+            </view>
+          </view>
+        </view>
+        <view class="type-indicator" wx:if="{{selectedTypeId === item._id}}">
+          <icon type="success" size="20" color="#07C160"></icon>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- Grid Mode -->
+    <scroll-view 
+      class="types-grid" 
+      scroll-y
+      wx:if="{{mode === 'grid'}}"
+    >
+      <view class="grid-container">
+        <view 
+          class="grid-item {{selectedTypeId === item._id ? 'selected' : ''}} {{readonly ? 'readonly' : ''}}"
+          wx:for="{{filteredTypes}}"
+          wx:key="_id"
+          data-id="{{item._id}}"
+          bindtap="onTypeSelect"
+        >
+          <view class="grid-icon" style="background-color: {{item.color}}20; color: {{item.color}}">
+            <text class="icon-text">{{item.icon || '🔗'}}</text>
+          </view>
+          <view class="grid-name">
+            {{item.nameI18nKey ? t[item._id + '.name'] : (currentLocale === 'en-US' && item.nameEn ? item.nameEn : item.name)}}
+          </view>
+          <view class="grid-indicator" wx:if="{{selectedTypeId === item._id}}">
+            <icon type="success_no_circle" size="16" color="#07C160"></icon>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- Empty State -->
+    <view class="empty-state" wx:if="{{filteredTypes.length === 0}}">
+      <view class="empty-icon">🔍</view>
+      <view class="empty-text">{{t.noResults}}</view>
+    </view>
+  </view>
+</view>

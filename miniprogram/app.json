@@ -3,7 +3,15 @@
     "pages/index/index",
     "pages/characters/list/list",
     "pages/characters/detail/detail",
-    "pages/guanxi/create/create"
+    "pages/characters/edit/edit",
+    "pages/characters/search/search",
+    "pages/guanxi/create/create",
+    "pages/guanxi/detail/detail",
+    "pages/guanxi/list/list",
+    "pages/graph/index/index",
+    "pages/timeline/index/index",
+    "pages/reminder/list/list",
+    "pages/setting/index/index"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -25,6 +33,14 @@
       {
         "pagePath": "pages/characters/list/list",
         "text": "人物"
+      },
+      {
+        "pagePath": "pages/graph/index/index",
+        "text": "关系图"
+      },
+      {
+        "pagePath": "pages/setting/index/index",
+        "text": "设置"
       }
     ]
   },

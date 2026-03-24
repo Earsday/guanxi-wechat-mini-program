@@ -1,0 +1,457 @@
+/* components/period-editor/period-editor.wxss */
+
+.period-editor {
+  width: 100%;
+}
+
+/* Periods List */
+.periods-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* Period Item */
+.period-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.period-item:hover {
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.1);
+}
+
+.period-item.readonly {
+  background: #f8f9fa;
+  box-shadow: none;
+}
+
+/* Period Header */
+.period-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.period-number {
+  flex-shrink: 0;
+}
+
+.number-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48rpx;
+  height: 48rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.period-status {
+  flex: 1;
+  margin-left: 16rpx;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+}
+
+.status-badge.active {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.ended {
+  background: #fce4ec;
+  color: #c2185b;
+}
+
+.status-badge.paused {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.status-text {
+  font-weight: 500;
+}
+
+.period-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.action-btn {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12rpx;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+.delete-btn {
+  background: #ffebee;
+}
+
+.delete-btn .icon {
+  color: #d32f2f;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+/* Form Field */
+.form-field {
+  margin-bottom: 24rpx;
+}
+
+.form-field:last-child {
+  margin-bottom: 0;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.label-text {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.required-mark {
+  color: #f44336;
+  margin-left: 4rpx;
+  font-size: 28rpx;
+}
+
+.field-control {
+  width: 100%;
+}
+
+/* Date Picker */
+.date-picker {
+  width: 100%;
+}
+
+.picker-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 80rpx;
+  padding: 0 24rpx;
+  background: #f8f9fa;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  transition: all 0.2s ease;
+}
+
+.picker-display:active {
+  background: #f0f0f0;
+  border-color: #667eea;
+}
+
+.date-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.picker-arrow {
+  font-size: 40rpx;
+  color: #999;
+  transform: rotate(-90deg);
+}
+
+/* Ongoing Badge */
+.ongoing-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+/* Checkbox Field */
+.checkbox-field {
+  margin-top: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-input {
+  transform: scale(1.2);
+  margin-right: 12rpx;
+}
+
+.checkbox-text {
+  font-size: 28rpx;
+  color: #555;
+}
+
+/* Note Textarea */
+.note-textarea {
+  width: 100%;
+  min-height: 120rpx;
+  padding: 16rpx 20rpx;
+  background: #f8f9fa;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.note-textarea:focus {
+  background: #fff;
+  border-color: #667eea;
+}
+
+.note-textarea::placeholder {
+  color: #bbb;
+}
+
+/* Readonly Value */
+.readonly-value {
+  padding: 16rpx 20rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* Period Duration Display */
+.period-duration {
+  margin-top: 16rpx;
+  padding: 16rpx 20rpx;
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-left: 4rpx solid #667eea;
+  border-radius: 8rpx;
+}
+
+.duration-text {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Add Period Section */
+.add-period-section {
+  margin-top: 24rpx;
+}
+
+.add-period-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.add-period-btn:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 2rpx 8rpx rgba(102, 126, 234, 0.3);
+}
+
+.add-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+  font-weight: 400;
+}
+
+.add-text {
+  font-size: 28rpx;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 80rpx 40rpx;
+  text-align: center;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .period-item {
+    background: #1e1e1e;
+    box-shadow: 0 2rpx 16rpx rgba(255, 255, 255, 0.05);
+  }
+
+  .period-item.readonly {
+    background: #2a2a2a;
+  }
+
+  .period-header {
+    border-bottom-color: #3a3a3a;
+  }
+
+  .status-badge.active {
+    background: #1b5e20;
+    color: #a5d6a7;
+  }
+
+  .status-badge.ended {
+    background: #880e4f;
+    color: #f48fb1;
+  }
+
+  .status-badge.paused {
+    background: #e65100;
+    color: #ffcc80;
+  }
+
+  .label-text {
+    color: #e0e0e0;
+  }
+
+  .picker-display {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+  }
+
+  .picker-display:active {
+    background: #333;
+    border-color: #667eea;
+  }
+
+  .date-text {
+    color: #e0e0e0;
+  }
+
+  .ongoing-badge {
+    background: #1565c0;
+    color: #bbdefb;
+  }
+
+  .checkbox-text {
+    color: #bbb;
+  }
+
+  .note-textarea {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+  }
+
+  .note-textarea:focus {
+    background: #333;
+    border-color: #667eea;
+  }
+
+  .readonly-value {
+    background: #2a2a2a;
+    color: #999;
+  }
+
+  .duration-text {
+    color: #bbb;
+  }
+
+  .empty-text {
+    color: #666;
+  }
+
+  .delete-btn {
+    background: #4a1f1f;
+  }
+
+  .delete-btn .icon {
+    color: #ef5350;
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 375px) {
+  .period-item {
+    padding: 20rpx;
+  }
+
+  .number-badge {
+    width: 44rpx;
+    height: 44rpx;
+    font-size: 26rpx;
+  }
+
+  .status-badge {
+    padding: 6rpx 16rpx;
+    font-size: 22rpx;
+  }
+
+  .action-btn {
+    width: 48rpx;
+    height: 48rpx;
+  }
+
+  .label-text {
+    font-size: 26rpx;
+  }
+
+  .picker-display {
+    height: 72rpx;
+    padding: 0 20rpx;
+  }
+
+  .date-text {
+    font-size: 26rpx;
+  }
+
+  .note-textarea {
+    min-height: 100rpx;
+    font-size: 26rpx;
+  }
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.period-item {
+  animation: slideIn 0.3s ease;
+}

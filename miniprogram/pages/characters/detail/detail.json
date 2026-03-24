@@ -1,4 +1,10 @@
 {
   "navigationBarTitleText": "人物详情",
-  "usingComponents": {}
+  "usingComponents": {
+    "stat-card": "../../../components/stat-card/stat-card",
+    "timeline": "../../../components/timeline/timeline",
+    "skeleton": "../../../components/skeleton/skeleton"
+  },
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f5f5"
 }

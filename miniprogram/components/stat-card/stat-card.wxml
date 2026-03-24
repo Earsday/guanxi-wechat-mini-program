@@ -1,0 +1,44 @@
+<!--components/stat-card/stat-card.wxml-->
+<view 
+  class="stat-card stat-card-{{size}} stat-card-{{layout}} {{colorClass}} {{clickable ? 'clickable' : ''}}"
+  bindtap="onCardTap"
+>
+  <!-- Loading overlay -->
+  <view wx:if="{{loading}}" class="stat-card-loading">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">{{t.loading}}</text>
+  </view>
+
+  <!-- Card content -->
+  <view wx:else class="stat-card-content">
+    <!-- Icon section -->
+    <view wx:if="{{icon}}" class="stat-card-icon" style="color: {{iconColor}}">
+      <text class="icon-text">{{icon}}</text>
+    </view>
+
+    <!-- Info section -->
+    <view class="stat-card-info">
+      <!-- Label -->
+      <view class="stat-card-label">{{label}}</view>
+      
+      <!-- Value -->
+      <view class="stat-card-value">{{formattedValue}}</view>
+      
+      <!-- Description -->
+      <view wx:if="{{description}}" class="stat-card-description">
+        {{description}}
+      </view>
+      
+      <!-- Trend indicator -->
+      <view wx:if="{{trend}}" class="stat-card-trend trend-{{trend}}">
+        <text class="trend-icon">
+          {{trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→'}}
+        </text>
+        <text wx:if="{{trendValue}}" class="trend-value">{{trendValue}}</text>
+      </view>
+    </view>
+
+    <!-- Custom slot for additional content -->
+    <slot></slot>
+  </view>
+</view>

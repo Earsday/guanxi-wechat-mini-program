@@ -1,4 +1,10 @@
 {
   "navigationBarTitleText": "创建关系",
-  "usingComponents": {}
+  "usingComponents": {
+    "character-picker": "../../../components/character-picker/character-picker",
+    "type-selector": "../../../components/type-selector/type-selector",
+    "dynamic-form": "../../../components/dynamic-form/dynamic-form"
+  },
+  "enablePullDownRefresh": false,
+  "backgroundColor": "#f5f5f5"
 }

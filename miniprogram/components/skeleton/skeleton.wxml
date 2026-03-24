@@ -1,0 +1,77 @@
+<!--components/skeleton/skeleton.wxml-->
+<view class="skeleton-wrapper" wx:if="{{loading}}">
+  <!-- List type skeleton -->
+  <block wx:if="{{type === 'list'}}">
+    <view 
+      class="skeleton-item skeleton-list-item {{animated ? 'skeleton-animated' : ''}}"
+      wx:for="{{items}}" 
+      wx:key="id"
+    >
+      <view class="skeleton-avatar" wx:if="{{avatar}}"></view>
+      <view class="skeleton-content">
+        <view class="skeleton-title"></view>
+        <view class="skeleton-text"></view>
+        <view class="skeleton-text short"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Card type skeleton -->
+  <block wx:if="{{type === 'card'}}">
+    <view 
+      class="skeleton-item skeleton-card {{animated ? 'skeleton-animated' : ''}}"
+      wx:for="{{items}}" 
+      wx:key="id"
+    >
+      <view class="skeleton-image"></view>
+      <view class="skeleton-card-content">
+        <view class="skeleton-title"></view>
+        <view class="skeleton-text"></view>
+        <view class="skeleton-text short"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Profile type skeleton -->
+  <block wx:if="{{type === 'profile'}}">
+    <view class="skeleton-profile {{animated ? 'skeleton-animated' : ''}}">
+      <view class="skeleton-profile-header">
+        <view class="skeleton-avatar-large"></view>
+        <view class="skeleton-profile-info">
+          <view class="skeleton-title"></view>
+          <view class="skeleton-text"></view>
+        </view>
+      </view>
+      <view class="skeleton-profile-stats">
+        <view class="skeleton-stat-item" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+          <view class="skeleton-stat-value"></view>
+          <view class="skeleton-stat-label"></view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Stats type skeleton -->
+  <block wx:if="{{type === 'stats'}}">
+    <view class="skeleton-stats {{animated ? 'skeleton-animated' : ''}}">
+      <view class="skeleton-stat-card" wx:for="{{items}}" wx:key="id">
+        <view class="skeleton-stat-icon"></view>
+        <view class="skeleton-stat-value"></view>
+        <view class="skeleton-stat-label"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- Form type skeleton -->
+  <block wx:if="{{type === 'form'}}">
+    <view class="skeleton-form {{animated ? 'skeleton-animated' : ''}}">
+      <view class="skeleton-form-item" wx:for="{{items}}" wx:key="id">
+        <view class="skeleton-label"></view>
+        <view class="skeleton-input"></view>
+      </view>
+    </view>
+  </block>
+</view>
+
+<!-- Actual content slot -->
+<slot wx:if="{{!loading}}"></slot>

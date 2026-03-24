@@ -1,4 +1,10 @@
 {
   "navigationBarTitleText": "人物列表",
-  "usingComponents": {}
+  "usingComponents": {
+    "alphabet-index": "../../../components/alphabet-index/alphabet-index",
+    "skeleton": "../../../components/skeleton/skeleton",
+    "empty-state": "../../../components/empty-state/empty-state"
+  },
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f5f5"
 }

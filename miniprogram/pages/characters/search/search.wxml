@@ -1,0 +1,104 @@
+<!--pages/characters/search/search.wxml-->
+<view class="search-page">
+  <!-- Search Bar -->
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <input
+        class="search-input"
+        type="text"
+        value="{{searchKeyword}}"
+        placeholder="{{t.search.placeholder || '搜索人物姓名、标签等'}}"
+        bindinput="onSearchInput"
+        bindconfirm="onSearchTap"
+        focus="{{true}}"
+      />
+      <view wx:if="{{searchKeyword}}" class="clear-btn" bindtap="onSearchClear">
+        <text class="icon">×</text>
+      </view>
+    </view>
+    <view class="search-btn" bindtap="onSearchTap">
+      <text>{{t.common.search || '搜索'}}</text>
+    </view>
+  </view>
+
+  <!-- Loading -->
+  <view wx:if="{{isSearching}}" class="loading-container">
+    <text class="loading-text">{{t.common.loading || '搜索中...'}}</text>
+  </view>
+
+  <!-- Search Results -->
+  <view wx:elif="{{hasSearched}}" class="search-results">
+    <view wx:if="{{searchResults.length > 0}}" class="results-header">
+      <text class="results-count">{{t.search.foundResults || '找到 {count} 个结果'}}</text>
+    </view>
+
+    <view wx:if="{{searchResults.length > 0}}" class="character-list">
+      <view
+        wx:for="{{searchResults}}"
+        wx:key="_id"
+        class="character-item"
+        bindtap="goToDetail"
+        data-id="{{item._id}}"
+      >
+        <view class="character-avatar">
+          <image wx:if="{{item.avatar}}" src="{{item.avatar}}" mode="aspectFill" />
+          <text wx:else class="avatar-placeholder">{{item.formattedName ? item.formattedName[0] : '?'}}</text>
+        </view>
+        <view class="character-info">
+          <view class="character-name">{{item.formattedName || item.name}}</view>
+          <view class="character-meta">
+            <text wx:if="{{item.gender}}" class="meta-item">
+              {{item.gender === 'male' ? (t.character.gender.male || '男') : (t.character.gender.female || '女')}}
+            </text>
+            <text wx:if="{{item.age}}" class="meta-item">{{item.age}}{{t.character.age || '岁'}}</text>
+            <text wx:if="{{item.tags && item.tags.length > 0}}" class="meta-item">
+              {{item.tags[0]}}
+            </text>
+          </view>
+        </view>
+        <view class="character-actions">
+          <view class="action-btn" catchtap="goToEdit" data-id="{{item._id}}">
+            <text>{{t.common.edit || '编辑'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- No Results -->
+    <view wx:else class="no-results">
+      <text class="no-results-icon">🔍</text>
+      <text class="no-results-text">{{t.search.noResults || '未找到相关人物'}}</text>
+      <text class="no-results-tip">{{t.search.noResultsTip || '试试其他关键词'}}</text>
+    </view>
+  </view>
+
+  <!-- Recent Searches (shown when not searching) -->
+  <view wx:else class="recent-searches">
+    <view wx:if="{{recentSearches.length > 0}}" class="recent-header">
+      <text class="recent-title">{{t.search.recentSearches || '最近搜索'}}</text>
+      <text class="clear-recent" bindtap="clearRecentSearches">
+        {{t.search.clearRecent || '清空'}}
+      </text>
+    </view>
+
+    <view wx:if="{{recentSearches.length > 0}}" class="recent-list">
+      <view
+        wx:for="{{recentSearches}}"
+        wx:key="*this"
+        class="recent-item"
+        bindtap="onRecentSearchTap"
+        data-keyword="{{item}}"
+      >
+        <text class="recent-icon">🕐</text>
+        <text class="recent-keyword">{{item}}</text>
+      </view>
+    </view>
+
+    <!-- Empty State -->
+    <view wx:else class="empty-state">
+      <text class="empty-icon">🔍</text>
+      <text class="empty-text">{{t.search.emptyState || '搜索人物'}}</text>
+      <text class="empty-tip">{{t.search.emptyTip || '输入姓名、标签等关键词'}}</text>
+    </view>
+  </view>
+</view>

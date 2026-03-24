@@ -1,0 +1,45 @@
+<!--components/empty-state/empty-state.wxml-->
+<wxs module="helper">
+  function getDisplayContent(type, icon, title, description, actionText, defaultStates) {
+    var defaultState = defaultStates[type] || defaultStates['data'];
+    return {
+      icon: icon || defaultState.icon,
+      title: title || defaultState.title,
+      description: description || defaultState.description,
+      actionText: actionText || defaultState.actionText
+    };
+  }
+  
+  module.exports = {
+    getDisplayContent: getDisplayContent
+  };
+</wxs>
+
+<view class="empty-state">
+  <view class="empty-state-content">
+    <!-- Icon -->
+    <view class="empty-icon">
+      <text class="icon-emoji">{{helper.getDisplayContent(type, icon, title, description, actionText, defaultStates).icon}}</text>
+    </view>
+    
+    <!-- Title -->
+    <view class="empty-title">
+      {{helper.getDisplayContent(type, icon, title, description, actionText, defaultStates).title}}
+    </view>
+    
+    <!-- Description -->
+    <view class="empty-description">
+      {{helper.getDisplayContent(type, icon, title, description, actionText, defaultStates).description}}
+    </view>
+    
+    <!-- Action Button -->
+    <view 
+      wx:if="{{showAction || helper.getDisplayContent(type, icon, title, description, actionText, defaultStates).actionText}}"
+      class="empty-action"
+    >
+      <view class="action-button" bindtap="onActionTap">
+        {{helper.getDisplayContent(type, icon, title, description, actionText, defaultStates).actionText}}
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,55 @@
+<!--components/timeline/timeline.wxml-->
+<view class="timeline-container timeline-{{mode}}">
+  <view wx:if="{{processedItems.length === 0}}" class="timeline-empty">
+    <text class="empty-text">{{t.noEvents || 'No events'}}</text>
+  </view>
+  
+  <view wx:else class="timeline-list">
+    <view 
+      wx:for="{{processedItems}}" 
+      wx:key="_index"
+      class="timeline-item timeline-item-{{index}} {{item._isCurrent ? 'is-current' : ''}} {{item._isPast ? 'is-past' : ''}} {{item._isFuture ? 'is-future' : ''}}"
+      data-index="{{index}}"
+      bindtap="{{clickable ? 'onItemTap' : ''}}"
+      bindlongpress="onItemLongPress"
+    >
+      <!-- Timeline dot/icon -->
+      <view class="timeline-marker">
+        <view wx:if="{{showIcons}}" class="timeline-icon {{item._icon}}">
+          <text class="icon-text">{{item.icon || '●'}}</text>
+        </view>
+        <view wx:else class="timeline-dot"></view>
+        
+        <!-- Connecting line (not shown for last item in vertical mode) -->
+        <view wx:if="{{mode === 'vertical' && index < processedItems.length - 1}}" class="timeline-line"></view>
+      </view>
+      
+      <!-- Content area -->
+      <view class="timeline-content">
+        <!-- Time label -->
+        <view wx:if="{{showTime}}" class="timeline-time">
+          <text class="time-absolute">{{item._displayDate}}</text>
+          <text wx:if="{{item._relativeTime}}" class="time-relative">{{item._relativeTime}}</text>
+        </view>
+        
+        <!-- Title -->
+        <view class="timeline-title">{{item.title}}</view>
+        
+        <!-- Description -->
+        <view wx:if="{{item.description}}" class="timeline-description">
+          {{item.description}}
+        </view>
+        
+        <!-- Additional metadata -->
+        <view wx:if="{{item.metadata}}" class="timeline-metadata">
+          <text wx:for="{{item.metadata}}" wx:for-item="meta" wx:key="key" class="metadata-item">
+            {{meta.label}}: {{meta.value}}
+          </text>
+        </view>
+        
+        <!-- Custom slot for additional content -->
+        <slot name="content-{{index}}"></slot>
+      </view>
+    </view>
+  </view>
+</view>

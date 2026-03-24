@@ -1,0 +1,182 @@
+<!--pages/guanxi/detail/detail.wxml - Guanxi relationship detail page template-->
+<view class="page-container">
+  <!-- Loading State -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">{{i18n.title}}</text>
+  </view>
+
+  <!-- Error State -->
+  <view wx:elif="{{error}}" class="error-container">
+    <view class="error-icon">⚠️</view>
+    <text class="error-text">
+      {{error === 'notFound' ? i18n.notFound : error === 'invalidParams' ? i18n.invalidParams : i18n.loadFailed}}
+    </text>
+    <button class="error-button" bindtap="loadData">{{i18n.retry}}</button>
+  </view>
+
+  <!-- Main Content -->
+  <view wx:else class="content-container">
+    <!-- Basic Information Section -->
+    <view class="section-card">
+      <view class="section-header">
+        <text class="section-title">{{i18n.basicInfo}}</text>
+      </view>
+      <view class="section-body">
+        <view class="info-row">
+          <text class="info-label">{{i18n.fromLabel}}</text>
+          <text 
+            class="info-value info-link" 
+            data-character-id="{{guanxi.fromCharacterId}}"
+            bindtap="onViewCharacter"
+          >
+            {{fromCharacter.name}}
+          </text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">{{i18n.toLabel}}</text>
+          <text 
+            class="info-value info-link" 
+            data-character-id="{{guanxi.toCharacterId}}"
+            bindtap="onViewCharacter"
+          >
+            {{toCharacter.name}}
+          </text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">{{i18n.typeLabel}}</text>
+          <text class="info-value">{{typeDefinition.name}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">{{i18n.createdAt}}</text>
+          <text class="info-value">{{guanxi.createdAtFormatted}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">{{i18n.updatedAt}}</text>
+          <text class="info-value">{{guanxi.updatedAtFormatted}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Current Period Section -->
+    <view wx:if="{{currentPeriod}}" class="section-card">
+      <view class="section-header">
+        <text class="section-title">{{i18n.currentPeriod}}</text>
+        <view class="status-badge status-active">{{i18n.active}}</view>
+      </view>
+      <view class="section-body">
+        <view class="info-row">
+          <text class="info-label">{{i18n.startTime}}</text>
+          <text class="info-value">{{formatPeriodDate(currentPeriod.startTime)}}</text>
+        </view>
+        <view wx:if="{{currentPeriod.note}}" class="info-row">
+          <text class="info-label">{{i18n.notes}}</text>
+          <text class="info-value">{{currentPeriod.note}}</text>
+        </view>
+        <button class="period-button" bindtap="onEndPeriod">
+          {{i18n.endPeriodButton}}
+        </button>
+      </view>
+    </view>
+
+    <!-- Historical Periods Section -->
+    <view wx:if="{{historicalPeriods && historicalPeriods.length > 0}}" class="section-card">
+      <view class="section-header">
+        <text class="section-title">{{i18n.historicalPeriods}}</text>
+      </view>
+      <view class="section-body">
+        <view 
+          wx:for="{{historicalPeriods}}" 
+          wx:key="id" 
+          class="period-item"
+        >
+          <view class="period-header">
+            <view class="status-badge status-inactive">{{i18n.inactive}}</view>
+          </view>
+          <view class="info-row">
+            <text class="info-label">{{i18n.startTime}}</text>
+            <text class="info-value">{{formatPeriodDate(item.startTime)}}</text>
+          </view>
+          <view class="info-row">
+            <text class="info-label">{{i18n.endTime}}</text>
+            <text class="info-value">{{formatPeriodDate(item.endTime)}}</text>
+          </view>
+          <view wx:if="{{item.note}}" class="info-row">
+            <text class="info-label">{{i18n.notes}}</text>
+            <text class="info-value">{{item.note}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Add Period Button (if no current period) -->
+    <view wx:if="{{!currentPeriod && typeDefinition.config.supportMultiPeriod}}" class="section-card">
+      <button class="add-period-button" bindtap="onAddPeriod">
+        {{i18n.addPeriodButton}}
+      </button>
+    </view>
+
+    <!-- Attributes Section -->
+    <view class="section-card">
+      <view class="section-header">
+        <text class="section-title">{{i18n.attributes}}</text>
+      </view>
+      <view class="section-body">
+        <view wx:if="{{guanxi.attributes && Object.keys(guanxi.attributes).length > 0}}">
+          <view 
+            wx:for="{{Object.keys(guanxi.attributes)}}" 
+            wx:for-item="fieldKey"
+            wx:key="fieldKey"
+            class="info-row"
+          >
+            <text class="info-label">{{getFieldLabel(fieldKey)}}</text>
+            <text class="info-value">{{getFieldDisplayValue(fieldKey, guanxi.attributes[fieldKey])}}</text>
+          </view>
+        </view>
+        <view wx:else class="empty-state">
+          <text class="empty-text">{{i18n.noAttributes}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Notes Section -->
+    <view wx:if="{{guanxi.note}}" class="section-card">
+      <view class="section-header">
+        <text class="section-title">{{i18n.notes}}</text>
+      </view>
+      <view class="section-body">
+        <text class="note-content">{{guanxi.note}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Action Buttons -->
+  <view wx:if="{{!loading && !error}}" class="action-buttons">
+    <button class="action-button edit-button" bindtap="onEdit">
+      {{i18n.editButton}}
+    </button>
+    <button class="action-button delete-button" bindtap="onDelete">
+      {{i18n.deleteButton}}
+    </button>
+  </view>
+
+  <!-- Delete Confirmation Modal -->
+  <view wx:if="{{showDeleteModal}}" class="modal-overlay">
+    <view class="modal-container">
+      <view class="modal-header">
+        <text class="modal-title">{{i18n.confirmDeleteTitle}}</text>
+      </view>
+      <view class="modal-body">
+        <text class="modal-content">{{i18n.confirmDeleteContent}}</text>
+      </view>
+      <view class="modal-footer">
+        <button class="modal-button cancel-button" bindtap="onCancelDelete">
+          {{i18n.cancel}}
+        </button>
+        <button class="modal-button confirm-button" bindtap="onConfirmDelete">
+          {{i18n.confirm}}
+        </button>
+      </view>
+    </view>
+  </view>
+</view>
